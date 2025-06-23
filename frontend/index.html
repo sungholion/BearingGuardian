@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>베어링 고장 예측</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🧰 베어링 고장 예측</h1>
+        <p>분석할 WAV 파일을 업로드하세요.</p>
+        
+        <div class="upload-section">
+            <input type="file" id="wavFile" accept=".wav">
+            <button id="predictBtn">예측 실행</button>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>📊 예측 결과</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Max</th>
+                        <th>Min</th>
+                        <th>RMS</th>
+                        <th>Kurtosis</th>
+                        <th>Crest</th>
+                        <th>Form</th>
+                        <th>예측된 고장 유형</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 결과가 여기에 동적으로 추가됩니다 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
