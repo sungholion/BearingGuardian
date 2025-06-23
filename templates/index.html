@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WAV Fault Prediction</title>
+</head>
+<body>
+    <h2>WAV 파일 업로드하여 이상 유형 예측</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" multiple required>
+        <button type="submit">예측하기</button>
+    </form>
+
+    {% if results %}
+    <h3>예측 결과:</h3>
+    <ul>
+        {% for filename, label in results %}
+        <li><strong>{{ filename }}</strong>: {{ label }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>

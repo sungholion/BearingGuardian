@@ -119,3 +119,5 @@ if __name__ == "__main__":
     joblib.dump(scaler_13, os.path.join(output_model_dir, "scaler.pkl"))
 
     print(f"✅ 13개 피처 기반 모델, 인코더, 스케일러가 '{output_model_dir}' 폴더에 저장되었습니다.")
+
+#### 안녕안녕
