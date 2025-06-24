@@ -1,41 +1,26 @@
-# BearingGuardian
-
-베어링 진동 데이터 기반 불량 유형 예측 및 잔여수명 예측 시스템
-
-## 프로젝트 구조
-
-```
-BearingGuardian/
-│
-├── backend/                # FastAPI 백엔드
-│   ├── app/
-│   │   ├── main.py           # FastAPI 앱 엔트리포인트
-│   │   ├── api/
-│   │   │   └── ml.py         # 머신러닝 관련 API
-│   │   ├── core/
-│   │   │   ├── config.py     # 환경설정
-│   │   │   └── database.py   # DB 연결 설정
-│   │   ├── models/
-│   │   │   ├── schemas.py    # Pydantic 모델
-│   │   │   └── db_models.py  # SQLAlchemy ORM 모델
-│   │   └── services/
-│   │       └── ml_service.py # ML 비즈니스 로직
-│   ├── requirements.txt    # 백엔드 의존성
-│   └── .env               # 환경변수
-│
-├── frontend/              # React 프론트엔드
-│   ├── public/              # 정적 파일
-│   ├── src/                 # React 소스코드
-│   ├── package.json         # 프론트엔드 의존성
-│   └── ...
-│
-├── data/                  # 데이터셋, 샘플 데이터
-├── scripts/               # 데이터 전처리, 학습 스크립트
-└── README.md
-```
-
-## 기술 스택
-- Backend: FastAPI, SQLAlchemy, MySQL
-- Frontend: React
-- ML/DL: (추후 추가 예정)
-
+[1. 데이터 소스]
+ └─ WAV 파일 등 원본 데이터
+     │
+     └─(대량 적재)──> [2. 데이터 레이크 & 분산 처리]
+                           │
+                           ├─ Hadoop HDFS (중앙 파일 저장소)
+                           │   │  ↑
+                           │   │  └─(특징 데이터 저장)─ Spark 작업
+                           │   │  │
+                           │   │  └─(병렬 읽기)───────┘
+                           │   │
+                           │   └─(특징 데이터 조회)──> [3. 모델 서빙]
+                           │                               │
+                           └────────> ML 모델 (.pkl) ──────┤
+                                                             │
+                                                             ├─ 실시간 예측 API
+                                                             │   │
+                                                             │   └─(예측 결과 발행)──> [4. 메시지 큐]
+                                                             │                           │
+                                                             │                           ├─ Kafka
+                                                             │                           │
+                                                             └────────(결과 구독)───> [5. 결과 활용]
+                                                                                         │
+                                                                                         ├─ 모니터링 대시보드
+                                                                                         ├─ 데이터베이스 저장
+                                                                                         └─ 알림 시스템
