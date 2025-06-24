@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+numpy
+scipy
+joblib
+pandas
+scikit-learn
+scikit-optimize # For model serving and optimization
+pydantic    
