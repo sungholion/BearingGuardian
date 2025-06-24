@@ -304,7 +304,7 @@ const Index = memo((props) => {
   return (
     <Fragment>
       <Row>
-        <Col md="12" lg="12">
+        <Col md="12" lg="12" style={{ visibility: 'hidden', height: '110px' }}>
           <Row className="row-cols-1">
             <div className="overflow-hidden d-slider1 " data-aos="fade-up" data-aos-delay="800">
               <Swiper
@@ -768,12 +768,12 @@ const Index = memo((props) => {
                 {/* 폼 영역 추가 시작 */}
                 <div className="card-header">
                   <div className="bd-example mb-4">
-                    <div className="header-title mt-3 mb-3">
+                    <div className="header-title mt-3">
                       <h4 className="card-title">실시간 진동 분석</h4>
                     </div>
                     <form>
                       <label
-                        className="form-label mb-0 me-2 mb-3"
+                        className="form-label mb-0 me-2 mb-4 mt-4"
                         htmlFor="customFile"
                         style={{ minWidth: 80 }}
                       >
@@ -794,14 +794,26 @@ const Index = memo((props) => {
                         </button>
                       </div>
                     </form>
-                    <div className="mt-3 mb-4">
+                    <div className="mt-3">
                       <div class="spinner-border text-light mt-3" role="status" style={{ width: "1.5rem", height: "1.5rem" }}>
                         <span class="visually-hidden">Loading...</span>
                       </div>
-                      <span className="ms-2 mt-3">현재 분석 중입니다.</span>
+                      <span className="ms-2 mt-4 mb-2">현재 분석 중입니다.</span>
+                      <span className="ms-2 mt-4 mb-2">✅ 분석이 완료되었습니다.</span>
                     </div>
                     {/* Alert 예제 시작 */}
-                    <div className="bd-example mt-4">
+                    <div className="bd-example mt-5 mb-4">
+                      <div className="alert alert-primary d-flex align-items-center" role="alert">
+                        <svg class="icon-32 me-2" width="32" height="130" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M2 11.9993C2 6.48027 6.48 1.99927 12 1.99927C17.53 1.99927 22 6.48027 22 11.9993C22 17.5203 17.53 21.9993 12 21.9993C6.48 21.9993 2 17.5203 2 11.9993ZM11.12 8.20927C11.12 7.73027 11.52 7.32927 12 7.32927C12.48 7.32927 12.87 7.73027 12.87 8.20927V12.6293C12.87 13.1103 12.48 13.4993 12 13.4993C11.52 13.4993 11.12 13.1103 11.12 12.6293V8.20927ZM12.01 16.6803C11.52 16.6803 11.13 16.2803 11.13 15.8003C11.13 15.3203 11.52 14.9303 12 14.9303C12.49 14.9303 12.88 15.3203 12.88 15.8003C12.88 16.2803 12.49 16.6803 12.01 16.6803Z" fill="currentColor">
+                          </path>
+                        </svg>
+                        <div>
+                          해당 영역에 분석결과가 표시됩니다.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bd-example mt-3 mb-4">
                       <svg xmlns="http://www.w3.org/2000/svg" style={{ display: "none" }}>
                         <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
                           <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
@@ -813,8 +825,9 @@ const Index = memo((props) => {
                           <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
                         </symbol>
                       </svg>
+
                       <div className="alert alert-success d-flex align-items-center" role="alert">
-                        <svg className="bi flex-shrink-0 me-2" width="24" height="85">
+                        <svg className="bi flex-shrink-0 me-2" width="24" height="115">
                           <use xlinkHref="#check-circle-fill" />
                         </svg>
                         <div>
@@ -822,7 +835,7 @@ const Index = memo((props) => {
                         </div>
                       </div>
                       <div className="alert alert-warning d-flex align-items-center" role="alert">
-                        <svg className="bi flex-shrink-0 me-2" width="24" height="85">
+                        <svg className="bi flex-shrink-0 me-2" width="24" height="115">
                           <use xlinkHref="#exclamation-triangle-fill" />
                         </svg>
                         <div>
@@ -830,11 +843,11 @@ const Index = memo((props) => {
                         </div>
                       </div>
                       <div className="alert alert-danger d-flex align-items-center" role="alert">
-                        <svg className="bi flex-shrink-0 me-2" width="24" height="85">
+                        <svg className="bi flex-shrink-0 me-2" width="24" height="115">
                           <use xlinkHref="#exclamation-triangle-fill" />
                         </svg>
                         <div>
-                          불량입니다.<br />(Ball_007-01)
+                          불량입니다.<br /><b>(불량 유형: Ball_007-01)</b>
                         </div>
                       </div>
                     </div>
@@ -917,7 +930,7 @@ const Index = memo((props) => {
               </div>
             </Col>
             <Col md="12" xl="6">
-              
+
             </Col>
 
 
@@ -945,7 +958,7 @@ const Index = memo((props) => {
                           d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
                         />
                       </svg>
-                      15 new acquired this month
+                      신규 불량 15건이 있습니다.
                     </p>
                   </div>
                 </div>
@@ -958,8 +971,8 @@ const Index = memo((props) => {
                     >
                       <thead>
                         <tr>
-                          <th>일시</th>
-                          <th>불량 여부</th>
+                          <th style={{ width: '20%' }}>일시</th>
+                          <th style={{ textAlign: 'center' }}>불량 여부</th>
                           <th>불량 유형</th>
                           <th>진동 값</th>
                         </tr>
@@ -968,37 +981,16 @@ const Index = memo((props) => {
                         <tr>
                           <td>
                             <div className="d-flex align-items-center">
-                              <img
-                                className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                src={shapes1}
-                                alt="profile"
-                              />
-                              <h6>Addidis Sportwear</h6>
+                              <h6>2025-06-24 16:00:58</h6>
                             </div>
                           </td>
-                          <td>
-                            <div className="iq-media-group iq-media-group-1">
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  SP
-                                </div>
-                              </Link>
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  PP
-                                </div>
-                              </Link>
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  MM
-                                </div>
-                              </Link>
-                            </div>
+                          <td style={{ textAlign: 'center' }}>
+                            <h6 className="text-danger">불량</h6>
                           </td>
-                          <td>$14,000</td>
+                          <td>OR_007_6_1</td>
                           <td>
                             <div className="mb-2 d-flex align-items-center">
-                              <h6>60%</h6>
+                              <h6>60Hz</h6>
                             </div>
                             <Progress
                               softcolors="primary"
@@ -1014,36 +1006,20 @@ const Index = memo((props) => {
                         <tr>
                           <td>
                             <div className="d-flex align-items-center">
-                              <img
-                                className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                src={shapes5}
-                                alt="profile"
-                              />
-                              <h6>Netflixer Platforms</h6>
+                              <h6>2025-06-24 13:00:58</h6>
                             </div>
                           </td>
-                          <td>
-                            <div className="iq-media-group iq-media-group-1">
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  SP
-                                </div>
-                              </Link>
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  PP
-                                </div>
-                              </Link>
-                            </div>
+                          <td style={{ textAlign: 'center' }}>
+                            <h6 className="text-success">정상</h6>
                           </td>
-                          <td>$30,000</td>
+                          <td>Normal</td>
                           <td>
                             <div className="mb-2 d-flex align-items-center">
-                              <h6>25%</h6>
+                              <h6>25Hz</h6>
                             </div>
                             <Progress
-                              softcolors="primary"
-                              color="primary"
+                              softcolors="success"
+                              color="success"
                               className="shadow-none w-100"
                               value={25}
                               minvalue={0}
@@ -1055,36 +1031,20 @@ const Index = memo((props) => {
                         <tr>
                           <td>
                             <div className="d-flex align-items-center">
-                              <img
-                                className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                src={shapes2}
-                                alt="profile"
-                              />
-                              <h6>Shopifi Stores</h6>
+                              <h6>2025-06-24 12:58:58</h6>
                             </div>
                           </td>
-                          <td>
-                            <div className="iq-media-group iq-media-group-1">
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  PP
-                                </div>
-                              </Link>
-                              <Link to="#" className="iq-media-1">
-                                <div className="icon iq-icon-box-3 rounded-pill">
-                                  TP
-                                </div>
-                              </Link>
-                            </div>
+                          <td style={{ textAlign: 'center' }}>
+                            <h6 className="text-danger">불량</h6>
                           </td>
-                          <td>$8,500</td>
+                          <td>IR_014_1</td>
                           <td>
                             <div className="mb-2 d-flex align-items-center">
-                              <h6>100%</h6>
+                              <h6>100Hz</h6>
                             </div>
                             <Progress
                               softcolors="success"
-                              color="success"
+                              color="primary"
                               className="shadow-none w-100"
                               value={100}
                               minvalue={0}
@@ -1096,6 +1056,25 @@ const Index = memo((props) => {
                       </tbody>
                     </table>
                   </div>
+                </div>
+                <div className="bd-example mt-4 mb-3 d-flex justify-content-center">
+                  <nav aria-label="Standard pagination example">
+                    <ul className="pagination">
+                      <li className="page-item">
+                        <a className="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">«</span>
+                        </a>
+                      </li>
+                      <li className="page-item"><a className="page-link" href="#">1</a></li>
+                      <li className="page-item"><a className="page-link" href="#">2</a></li>
+                      <li className="page-item"><a className="page-link" href="#">3</a></li>
+                      <li className="page-item">
+                        <a className="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">»</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
                 </div>
               </div>
             </Col>
@@ -1111,7 +1090,7 @@ const Index = memo((props) => {
               >
                 <div className="pb-4 border-0 card-header">
                   <div className="p-3 border border-white rounded primary-gradient-card">
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex justify-content-between align-items-center mt-3">
                       <div>
                         <h5 className="font-weight-bold">OOO사</h5>
                         <p className="mb-0">A공장</p>
@@ -1177,7 +1156,7 @@ const Index = memo((props) => {
                           </g>
                         </svg>
                         <div className="ms-2">
-                          <span className="text-gray">정상</span>
+                          <span className="text-gray">미연결</span>
                         </div>
                       </div>
                     </div>
@@ -1208,27 +1187,28 @@ const Index = memo((props) => {
                       </div>
                     </div>
                   </div>
-                    <div className="flex-wrap d-flex align-itmes-center mt-3">
-                      <div className="d-flex mt-2 align-itmes-center">
-                        <div>
-                          <div className="p-3 rounded bg-soft-info">
-                            <svg
-                              width="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg">                                <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                                <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                                <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                                <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="ms-3">
-                          <h5>보고서 다운로드</h5>
-                          <small className="mb-0">2025-06-20 기준</small>
+                  <hr className="hr" />
+                  <div className="flex-wrap d-flex align-itmes-center mt-3">
+                    <div className="d-flex mt-2 align-itmes-center">
+                      <div>
+                        <div className="p-3 rounded bg-soft-info">
+                          <svg
+                            width="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">                                <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                                <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                                <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                                <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
+                          </svg>
                         </div>
                       </div>
+                      <div className="ms-3">
+                        <h5>보고서 다운로드</h5>
+                        <small className="mb-0">2025-06-20 기준</small>
+                      </div>
                     </div>
+                  </div>
 
-                    {/* <div className="grid-cols-2 d-grid gap"> */}
-                    {/* <button className="btn btn-primary text-uppercase">
+                  {/* <div className="grid-cols-2 d-grid gap"> */}
+                  {/* <button className="btn btn-primary text-uppercase">
                       <svg
                             width="20"
                             viewBox="0 0 24 24"
@@ -1237,49 +1217,49 @@ const Index = memo((props) => {
                           </svg>
                       보고서 다운로드
                     </button> */}
-                    {/* <button className="btn btn-info text-uppercase">
+                  {/* <button className="btn btn-info text-uppercase">
                       ANALYTICS
                     </button> */}
-                    {/* </div> */}
-                  </div>
+                  {/* </div> */}
                 </div>
+              </div>
 
-                <div className="card" data-aos="fade-up" data-aos-delay="800" style={{ height: "400px" }}>
-                  <div className="flex-wrap card-header d-flex justify-content-between">
-                    <div className="header-title mb-2">
-                      <h4 className="card-title">Conversions</h4>
-                      <p className="mb-0">진동값 평균</p>
-                    </div>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        as={Button}
-                        variant="text-gray"
-                        type="button"
-                        id="dropdownMenuButtonSM"
-                      >
-                        기간 설정
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#">이번 주</Dropdown.Item>
-                        <Dropdown.Item href="#">이번 달</Dropdown.Item>
-                        <Dropdown.Item href="#">올해</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="card-body">
-                    <Chart
-                      className="d-activity"
-                      options={chart3.options}
-                      series={chart3.series}
-                      type="bar"
-                      height="240"
-                      margin="10 0 0 0"
-                    />
-                  </div>
-                </div>
-                <div className="card" data-aos="fade-up" data-aos-delay="900">
+              <div className="card" data-aos="fade-up" data-aos-delay="800" style={{ height: "400px" }}>
                 <div className="flex-wrap card-header d-flex justify-content-between">
-                  <div className="header-title mt-2">
+                  <div className="header-title mb-2">
+                    <h4 className="card-title">Conversions</h4>
+                    <p className="mb-0">진동값 평균</p>
+                  </div>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      as={Button}
+                      variant="text-gray"
+                      type="button"
+                      id="dropdownMenuButtonSM"
+                    >
+                      기간 설정
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item href="#">이번 주</Dropdown.Item>
+                      <Dropdown.Item href="#">이번 달</Dropdown.Item>
+                      <Dropdown.Item href="#">올해</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+                <div className="card-body">
+                  <Chart
+                    className="d-activity"
+                    options={chart3.options}
+                    series={chart3.series}
+                    type="bar"
+                    height="240"
+                    margin="10 0 0 0"
+                  />
+                </div>
+              </div>
+              <div className="card" data-aos="fade-up" data-aos-delay="900">
+                <div className="flex-wrap card-header d-flex justify-content-between">
+                  <div className="header-title mt-2 mb-3">
                     <h4 className="card-title">불량 유형</h4>
                   </div>
                   <Dropdown>
@@ -1301,11 +1281,11 @@ const Index = memo((props) => {
                 <div className="card-body">
                   <div className="flex-wrap d-flex align-items-center justify-content-between">
                     <Chart
-                      className="col-md-8 col-lg-8"
+                      className="col-md-8 col-lg-8 mb-4"
                       options={chart2.options}
                       series={chart2.series}
                       type="donut"
-                      height="250"
+                      height="245"
                     />
                     <div className="d-grid gap col-md-4 col-lg-4">
                       {chartLegendData.map((item, index) => (
