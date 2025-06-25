@@ -52,4 +52,7 @@ Thumbs.db
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Reference code (temporary)
+backend/tmp/ 
