@@ -1,4 +1,4 @@
-// "C:\Users\jh\Documents\GitHub\br\frontend\src\views\dashboard\index.js"
+//"C:\Users\jh\Documents\GitHub\br\frontend\src\views\dashboard\index.js"
 import WavPredictionCard from "../../components/common/WavPredictionCard";
 import CsvPredictionCard from "../../components/common/CsvPredictionCard";
 import RecentPredictionsCard from '../../components/common/RecentPredictionsCard';
@@ -42,33 +42,22 @@ import CountUp from "react-countup";
 // Redux Selector / Action
 import { useSelector } from "react-redux";
 
+// Import selectors & action from setting store
+import * as SettingSelector from "../../store/setting/selectors"; // ✅ 오류 수정: import * as [별칭] from ...
+
 // install Swiper modules
 SwiperCore.use([Navigation]);
 
 const Index = memo((props) => {
-  // Redux useSelector는 값을 변수에 할당하여 사용하거나, 현재 사용되지 않으면 제거합니다.
-  // useSelector(SettingSelector.theme_color);
+  useSelector(SettingSelector.theme_color);
 
-  // ✅ 컴포넌트 내부에 상태 및 useEffect 추가 (기존 recentHistory)
+  // ✅ 컴포넌트 내부에 상태 및 useEffect 추가
   const [recentHistory, setRecentHistory] = useState([]);
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/v1/ml/history/recent")
       .then((res) => setRecentHistory(res.data))
       .catch((err) => console.error("히스토리 불러오기 실패", err));
-  }, []);
-
-  // ✅ faultChart 상태 추가 및 API 호출
-  const [faultChart, setFaultChart] = useState({ labels: [], series: [] });
-  useEffect(() => {
-    axios.get("http://localhost:8000/api/v1/ml/fault-summary")
-      .then((res) => {
-        setFaultChart({
-          labels: res.data.labels,
-          series: res.data.series
-        });
-      })
-      .catch((err) => console.error("고장 유형 데이터 불러오기 실패", err));
   }, []);
 
 
@@ -100,10 +89,9 @@ const Index = memo((props) => {
   const variableColors = getVariableColor();
 
   const colors = [variableColors.primary, variableColors.info];
-  // 이 useEffect는 불필요합니다. colors는 이미 상수로 정의되었습니다.
-  // useEffect(() => {
-  //   return () => colors;
-  // });
+  useEffect(() => {
+    return () => colors;
+  });
 
   useEffect(() => {
     AOS.init({
@@ -199,31 +187,17 @@ const Index = memo((props) => {
       },
     ],
   };
+  // chart2 정의
+  const series = [251, 176, 105];
+  const labels = ["Ball", "IR", "OR"];
+  const total = series.reduce((sum, val) => sum + val, 0);
 
-    // ✅ fault-summary → faultChart 변환 처리
-  useEffect(() => {
-    axios.get("http://localhost:8000/api/v1/ml/fault-summary")
-      .then((res) => {
-        // 응답 데이터 구조 확인
-        console.log("fault-summary 응답:", res.data);
-        // 아래 구조에 맞게 실제 데이터 매핑
-        const summary = res.data.summary || {};
-        const labels = Object.keys(summary);
-        const series = Object.values(summary);
-        setFaultChart({ labels, series });
-      })
-      .catch((err) => console.error("고장 유형 데이터 불러오기 실패", err));
-  }, []);
+  // Define the colors for chart2 directly
+  const chart2Colors = ['#3a57e8', '#4bc7d2', '#00e396']; // These are the colors from chart2.options.colors
 
-
-  // chart2 색상 배열을 labels 개수에 맞게 동적으로 확장
-const chart2BaseColors = ['#3a57e8', '#4bc7d2', '#00e396', '#ff9800', '#f44336', '#9c27b0', '#607d8b'];
-const chart2Colors = faultChart.labels.map((_, idx) => chart2BaseColors[idx % chart2BaseColors.length]);
-
-  // ✅ chart2 정의를 API 데이터에 따라 동적으로 변경
   const chart2 = {
     options: {
-      labels: faultChart.labels, // ✅ faultChart.labels 사용
+      labels: labels,
       colors: chart2Colors,
       chart: {
         type: 'donut',
@@ -257,25 +231,17 @@ const chart2Colors = faultChart.labels.map((_, idx) => chart2BaseColors[idx % ch
         },
       },
     },
-    series: faultChart.series // ✅ faultChart.series 사용
+    series: series,
   };
 
-// legend 데이터 생성 (labels, series, colors 모두 있을 때만)
-const chartLegendData = (
-  Array.isArray(faultChart.series) &&
-  Array.isArray(faultChart.labels) &&
-  faultChart.series.length === faultChart.labels.length
-)
-  ? faultChart.series.map((value, idx) => {
-      const total = faultChart.series.reduce((sum, val) => sum + val, 0);
-      return {
-        label: faultChart.labels[idx],
-        count: value,
-        percent: total ? ((value / total) * 100).toFixed(1) : '0.0',
-        color: chart2Colors[idx],
-      };
-    })
-  : [];
+  const chartLegendData = series.map((value, idx) => ({
+    label: labels[idx],
+    count: value,
+    percent: ((value / total) * 100).toFixed(1),
+    color: chart2Colors[idx] // Use chart2Colors for the legend as well
+  }));
+
+
 
 
   const chart3 = {
@@ -669,6 +635,47 @@ const chartLegendData = (
                         </svg>
                       </Circularprogressbar>
                       <div className="progress-detail">
+                        <p className="mb-2">IR_021_1 </p>
+                        <h4 className="counter">
+                          <CountUp
+                            start={2}
+                            end={11.2}
+                            duration={3}
+                            decimals={1}
+                          />
+                          M
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide className=" card card-slide">
+                  <div className="card-body">
+                    <div className="progress-widget">
+                      <Circularprogressbar
+                        stroke={colors}
+                        Linecap="rounded"
+                        trailstroke="#ddd"
+                        strokewidth="4px"
+                        width="60px"
+                        height="60px"
+                        value={30}
+                        style={{ width: 60, height: 60 }}
+                        id="circle-progress-07"
+                      >
+                        <svg
+                          className=""
+                          width="24px"
+                          height="24px"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
+                          />
+                        </svg>
+                      </Circularprogressbar>
+                      <div className="progress-detail">
                         <p className="mb-2">OR_007_6_1</p>
                         <h4 className="counter">
                           <CountUp
@@ -809,8 +816,8 @@ const chartLegendData = (
                       </div>
                     </form>
                     <div className="mt-3 mb-4">
-                      <div className="spinner-border text-light mt-3" role="status" style={{ width: "1.5rem", height: "1.5rem" }}>
-                        <span className="visually-hidden">Loading...</span>
+                      <div class="spinner-border text-light mt-3" role="status" style={{ width: "1.5rem", height: "1.5rem" }}>
+                        <span class="visually-hidden">Loading...</span>
                       </div>
                       <span className="ms-2 mt-3">현재 분석 중입니다.</span>
                     </div>
@@ -963,25 +970,28 @@ const chartLegendData = (
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 table-responsive">
-                  <table
-                    id="basic-table"
-                    className="table mb-0 table-striped"
-                    role="grid"
-                  >
-                    <thead>
-                      <tr>
-                        <th>예측 시간</th>
-                        <th>불량 여부</th>
-                        <th>고장 유형</th>
-                        <th>진동 특징</th>
-                        <th>RMS 상태</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <RecentPredictionsCard data={recentHistory} />
-                    </tbody>
-                  </table>
+                <div className="p-0 card-body">
+                  <div className="mt-4 table-responsive">
+                    <table
+                      id="basic-table"
+                      className="table mb-0 table-striped"
+                      role="grid"
+                    >
+                      <thead>
+                          <tr>
+                            <th>예측 시간</th> {/* '일시' 대신 '예측 시간'으로 변경 */}
+                            <th>불량 여부</th>
+                            <th>고장 유형</th> {/* '불량 유형' 대신 '고장 유형'으로 변경 */}
+                            <th>진동 특징</th> {/* '진동 값' 대신 '진동 특징'으로 변경 */}
+                            <th>RMS 상태</th> {/* RMS 시각화 컬럼 헤더 추가 */}
+                          </tr>
+                      </thead>
+                      {/* ✅ 기존 <tbody> 자리에 삽입 */}
+                      <tbody>
+                        <RecentPredictionsCard data={recentHistory} />
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </Col>
@@ -1051,14 +1061,14 @@ const chartLegendData = (
                           xmlns="http://www.w3.org/2000/svg"
                           width="12"
                           viewBox="0 0 24 24"
-                          // fill="currentColor" // currentColor 대신 명시적 색상 지정
+                          fill="currentColor"
                         >
                           <g>
                             <circle
                               cx="12"
                               cy="12"
                               r="8"
-                              fill="#e50000" // 빨간색으로 변경
+                              fill="#e50000"
                             ></circle>
                           </g>
                         </svg>
@@ -1077,14 +1087,14 @@ const chartLegendData = (
                           xmlns="http://www.w3.org/2000/svg"
                           width="12"
                           viewBox="0 0 24 24"
-                          // fill="currentColor" // currentColor 대신 명시적 색상 지정
+                          fill="currentColor"
                         >
                           <g>
                             <circle
                               cx="12"
                               cy="12"
                               r="8"
-                              fill="#008000" // 초록색으로 변경
+                              fill="green"
                             ></circle>
                           </g>
                         </svg>
@@ -1102,7 +1112,7 @@ const chartLegendData = (
                             width="20"
                             viewBox="0 0 24 24"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg">                         <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                         <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                         <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                         <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
+                            xmlns="http://www.w3.org/2000/svg">                                 <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                                 <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                                 <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                                 <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
                           </svg>
                         </div>
                       </div>
@@ -1115,17 +1125,17 @@ const chartLegendData = (
 
                   {/* <div className="grid-cols-2 d-grid gap"> */}
                   {/* <button className="btn btn-primary text-uppercase">
-                      <svg
-                              width="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg">                         <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                         <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                         <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                         <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
-                      </svg>
-                      보고서 다운로드
-                    </button> */}
+                      <svg
+                            width="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">                                <path opacity="0.4" d="M16.6756 2H7.33333C3.92889 2 2 3.92889 2 7.33333V16.6667C2 20.0711 3.92889 22 7.33333 22H16.6756C20.08 22 22 20.0711 22 16.6667V7.33333C22 3.92889 20.08 2 16.6756 2Z" fill="currentColor"></path>                                <path d="M7.36866 9.3689C6.91533 9.3689 6.54199 9.74223 6.54199 10.2045V17.0756C6.54199 17.5289 6.91533 17.9022 7.36866 17.9022C7.83088 17.9022 8.20421 17.5289 8.20421 17.0756V10.2045C8.20421 9.74223 7.83088 9.3689 7.36866 9.3689Z" fill="currentColor"></path>                                <path d="M12.0352 6.08887C11.5818 6.08887 11.2085 6.4622 11.2085 6.92442V17.0755C11.2085 17.5289 11.5818 17.9022 12.0352 17.9022C12.4974 17.9022 12.8707 17.5289 12.8707 17.0755V6.92442C12.8707 6.4622 12.4974 6.08887 12.0352 6.08887Z" fill="currentColor"></path>                                <path d="M16.6398 12.9956C16.1775 12.9956 15.8042 13.3689 15.8042 13.8312V17.0756C15.8042 17.5289 16.1775 17.9023 16.6309 17.9023C17.0931 17.9023 17.4664 17.5289 17.4664 17.0756V13.8312C17.4664 13.3689 17.0931 12.9956 16.6398 12.9956Z" fill="currentColor"></path>
+                      </svg>
+                      보고서 다운로드
+                    </button> */}
                   {/* <button className="btn btn-info text-uppercase">
-                      ANALYTICS
-                    </button> */}
+                      ANALYTICS
+                    </button> */}
                   {/* </div> */}
                 </div>
               </div>
@@ -1133,8 +1143,40 @@ const chartLegendData = (
               <div className="card" data-aos="fade-up" data-aos-delay="800" style={{ height: "400px" }}>
                 <div className="flex-wrap card-header d-flex justify-content-between">
                   <div className="header-title mb-2">
-                    <h4 className="card-title">불량 유형</h4> {/* "Conversions"를 "불량 유형"으로 변경 */}
+                    <h4 className="card-title">Conversions</h4>
                     <p className="mb-0">진동값 평균</p>
+                  </div>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      as={Button}
+                      variant="text-gray"
+                      type="button"
+                      id="dropdownMenuButtonSM"
+                    >
+                      기간 설정
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item href="#">이번 주</Dropdown.Item>
+                      <Dropdown.Item href="#">이번 달</Dropdown.Item>
+                      <Dropdown.Item href="#">올해</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+                <div className="card-body">
+                  <Chart
+                    className="d-activity"
+                    options={chart3.options}
+                    series={chart3.series}
+                    type="bar"
+                    height="240"
+                    margin="10 0 0 0"
+                  />
+                </div>
+              </div>
+              <div className="card" data-aos="fade-up" data-aos-delay="900">
+                <div className="flex-wrap card-header d-flex justify-content-between">
+                  <div className="header-title mt-2">
+                    <h4 className="card-title">불량 유형</h4>
                   </div>
                   <Dropdown>
                     <Dropdown.Toggle
@@ -1154,43 +1196,38 @@ const chartLegendData = (
                 </div>
                 <div className="card-body">
                   <div className="flex-wrap d-flex align-items-center justify-content-between">
-                    {chart2.series && chart2.series.length > 0 && chart2.series.some(v => v > 0) ? (
-                      <>
-                        <Chart
-                          className="col-md-8 col-lg-8"
-                          options={chart2.options}
-                          series={chart2.series}
-                          type="donut"
-                          height="250"
-                        />
-                        <div className="d-grid gap col-md-4 col-lg-4">
-                          {chartLegendData.map((item, index) => (
-                            <div className="d-flex align-items-start" key={index}>
-                              <svg
-                                className="mt-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="14"
-                                viewBox="0 0 24 24"
-                                fill={item.color}
-                              >
-                                <circle cx="12" cy="12" r="8" fill={item.color}></circle>
-                              </svg>
-                              <div className="ms-3">
-                                <span className="text-gray">{item.label}</span>
-                                <h6>
-                                  {item.count}건 <span className="text-muted">({item.percent}%)</span>
-                                </h6>
-                              </div>
-                            </div>
-                          ))}
+                    <Chart
+                      className="col-md-8 col-lg-8"
+                      options={chart2.options}
+                      series={chart2.series}
+                      type="donut"
+                      height="250"
+                    />
+                    <div className="d-grid gap col-md-4 col-lg-4">
+                      {chartLegendData.map((item, index) => (
+                        <div className="d-flex align-items-start" key={index}>
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill={item.color}
+                          >
+                            <circle cx="12" cy="12" r="8" fill={item.color}></circle>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">{item.label}</span>
+                            <h6>
+                              {item.count}건 <span className="text-muted">({item.percent}%)</span>
+                            </h6>
+                          </div>
                         </div>
-                      </>
-                    ) : (
-                      <div className="w-100 text-center text-muted py-5">불량 유형 데이터가 없습니다.</div>
-                    )}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
+
             </Col>
           </Row>
           <Row>
@@ -1208,9 +1245,6 @@ const chartLegendData = (
             </Card.Body>
           </Card>
         </div>
-        {/* WavPredictionCard 및 CsvPredictionCard 위치 유지 */}
-        <WavPredictionCard />
-        <CsvPredictionCard />
       </section>
 
     </Fragment>

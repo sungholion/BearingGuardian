@@ -204,27 +204,21 @@ const Index = memo((props) => {
   useEffect(() => {
     axios.get("http://localhost:8000/api/v1/ml/fault-summary")
       .then((res) => {
-        // 응답 데이터 구조 확인
-        console.log("fault-summary 응답:", res.data);
-        // 아래 구조에 맞게 실제 데이터 매핑
-        const summary = res.data.summary || {};
+        const summary = res.data.summary;
         const labels = Object.keys(summary);
         const series = Object.values(summary);
+
         setFaultChart({ labels, series });
       })
       .catch((err) => console.error("고장 유형 데이터 불러오기 실패", err));
   }, []);
 
 
-  // chart2 색상 배열을 labels 개수에 맞게 동적으로 확장
-const chart2BaseColors = ['#3a57e8', '#4bc7d2', '#00e396', '#ff9800', '#f44336', '#9c27b0', '#607d8b'];
-const chart2Colors = faultChart.labels.map((_, idx) => chart2BaseColors[idx % chart2BaseColors.length]);
-
   // ✅ chart2 정의를 API 데이터에 따라 동적으로 변경
   const chart2 = {
     options: {
       labels: faultChart.labels, // ✅ faultChart.labels 사용
-      colors: chart2Colors,
+      colors: ['#3a57e8', '#4bc7d2', '#00e396'], // 이 색상은 고정 또는 faultChart에서 가져올 수 있음
       chart: {
         type: 'donut',
         fontFamily: `'Inter', sans-serif`,
@@ -260,22 +254,18 @@ const chart2Colors = faultChart.labels.map((_, idx) => chart2BaseColors[idx % ch
     series: faultChart.series // ✅ faultChart.series 사용
   };
 
-// legend 데이터 생성 (labels, series, colors 모두 있을 때만)
-const chartLegendData = (
-  Array.isArray(faultChart.series) &&
-  Array.isArray(faultChart.labels) &&
-  faultChart.series.length === faultChart.labels.length
-)
-  ? faultChart.series.map((value, idx) => {
-      const total = faultChart.series.reduce((sum, val) => sum + val, 0);
-      return {
-        label: faultChart.labels[idx],
-        count: value,
-        percent: total ? ((value / total) * 100).toFixed(1) : '0.0',
-        color: chart2Colors[idx],
-      };
-    })
+// ✅ chartLegendData도 faultChart 기반으로 수정 (에러 방지 조건 추가)
+const chartLegendData = (faultChart.series && faultChart.labels)
+  ? faultChart.series.map((value, idx) => ({
+      label: faultChart.labels[idx],
+      count: value,
+      percent: (
+        (value / faultChart.series.reduce((sum, val) => sum + val, 0)) * 100
+      ).toFixed(1),
+      color: chart2.options.colors[idx],
+    }))
   : [];
+
 
 
   const chart3 = {
@@ -963,25 +953,27 @@ const chartLegendData = (
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 table-responsive">
-                  <table
-                    id="basic-table"
-                    className="table mb-0 table-striped"
-                    role="grid"
-                  >
-                    <thead>
-                      <tr>
-                        <th>예측 시간</th>
-                        <th>불량 여부</th>
-                        <th>고장 유형</th>
-                        <th>진동 특징</th>
-                        <th>RMS 상태</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <RecentPredictionsCard data={recentHistory} />
-                    </tbody>
-                  </table>
+                <div className="p-0 card-body">
+                  <div className="mt-4 table-responsive">
+                    <table
+                      id="basic-table"
+                      className="table mb-0 table-striped"
+                      role="grid"
+                    >
+                      <thead>
+                        <tr>
+                          <th>예측 시간</th> {/* '일시' 대신 '예측 시간'으로 변경 */}
+                          <th>불량 여부</th>
+                          <th>고장 유형</th> {/* '불량 유형' 대신 '고장 유형'으로 변경 */}
+                          <th>진동 특징</th> {/* '진동 값' 대신 '진동 특징'으로 변경 */}
+                          <th>RMS 상태</th> {/* RMS 시각화 컬럼 헤더 추가 */}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <RecentPredictionsCard data={recentHistory} />
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </Col>
@@ -1154,40 +1146,34 @@ const chartLegendData = (
                 </div>
                 <div className="card-body">
                   <div className="flex-wrap d-flex align-items-center justify-content-between">
-                    {chart2.series && chart2.series.length > 0 && chart2.series.some(v => v > 0) ? (
-                      <>
-                        <Chart
-                          className="col-md-8 col-lg-8"
-                          options={chart2.options}
-                          series={chart2.series}
-                          type="donut"
-                          height="250"
-                        />
-                        <div className="d-grid gap col-md-4 col-lg-4">
-                          {chartLegendData.map((item, index) => (
-                            <div className="d-flex align-items-start" key={index}>
-                              <svg
-                                className="mt-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="14"
-                                viewBox="0 0 24 24"
-                                fill={item.color}
-                              >
-                                <circle cx="12" cy="12" r="8" fill={item.color}></circle>
-                              </svg>
-                              <div className="ms-3">
-                                <span className="text-gray">{item.label}</span>
-                                <h6>
-                                  {item.count}건 <span className="text-muted">({item.percent}%)</span>
-                                </h6>
-                              </div>
-                            </div>
-                          ))}
+                    <Chart
+                      className="col-md-8 col-lg-8"
+                      options={chart2.options}
+                      series={chart2.series}
+                      type="donut"
+                      height="250"
+                    />
+                    <div className="d-grid gap col-md-4 col-lg-4">
+                      {chartLegendData.map((item, index) => (
+                        <div className="d-flex align-items-start" key={index}>
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill={item.color}
+                          >
+                            <circle cx="12" cy="12" r="8" fill={item.color}></circle>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">{item.label}</span>
+                            <h6>
+                              {item.count}건 <span className="text-muted">({item.percent}%)</span>
+                            </h6>
+                          </div>
                         </div>
-                      </>
-                    ) : (
-                      <div className="w-100 text-center text-muted py-5">불량 유형 데이터가 없습니다.</div>
-                    )}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

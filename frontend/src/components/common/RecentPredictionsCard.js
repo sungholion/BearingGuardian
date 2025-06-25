@@ -1,86 +1,90 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import React from 'react';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
-const getStatusInfo = (rms) => {
-  if (rms < 100) return { label: "정상", color: "#3a57e8" };       // 파란색
-  if (rms < 300) return { label: "주의", color: "#ffc107" };       // 노란색
-  return { label: "위험", color: "#dc3545" };                      // 빨간색
-};
+// RMS 값에 따라 색상을 반환하는 유틸리티 함수
+function getColorByRMS(rms) {
+  if (rms > 1000) return "red";
+  if (rms > 100) return "orange";
+  return "green";
+}
 
-const RecentPredictionsCard = () => {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// RMS 값에 따라 레이블을 반환하는 유틸리티 함수
+function getLabelByRMS(rms) {
+  if (rms > 1000) return "위험";
+  if (rms > 100) return "주의";
+  return "정상";
+}
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/v1/ml/history/recent")
-      .then((res) => setHistory(res.data))
-      .catch(() => setError("히스토리 데이터를 불러오지 못했습니다."))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
+const RecentPredictionsCard = ({ data }) => {
+  if (!data || data.length === 0) {
     return (
       <tr>
-        <td colSpan="4">Loading...</td>
-      </tr>
-    );
-  }
-
-  if (error) {
-    return (
-      <tr>
-        <td colSpan="4">{error}</td>
+        <td colSpan="5" className="text-center">최근 예측 기록이 없습니다.</td>
       </tr>
     );
   }
 
   return (
     <>
-      {history.map((item, idx) => {
-        const { rms } = item.features;
-        const statusInfo = getStatusInfo(rms);
+      {data.map((item, index) => {
+        // '정상'이 아닌 모든 predicted_fault는 불량으로 간주
+        const isFault = item.predicted_fault !== "정상";
+        const rmsValue = item.features?.rms; // optional chaining으로 features.rms 안전하게 접근
 
         return (
-          <tr key={item.id}>
+          <tr key={item.id || index}> {/* item.id가 있으면 고유 키로 사용, 없으면 index */}
             <td>
               <div className="d-flex align-items-center">
-                <div className="rounded bg-soft-primary img-fluid avatar-40 me-3 d-flex align-items-center justify-content-center">
-                  <span className="text-primary fw-bold">
-                    {item.predicted_fault.split("_")[0][0]}
-                  </span>
-                </div>
-                <h6 className="mb-0">{item.predicted_fault}</h6>
+                {/* predicted_time 사용 및 한국 로케일 포맷 적용 */}
+                <h6>{new Date(item.predicted_time).toLocaleString('ko-KR')}</h6>
               </div>
             </td>
             <td>
-              <span className="badge bg-secondary">
-                {new Date(item.predicted_time).toLocaleString()}
+              <span className={`badge ${isFault ? 'bg-danger' : 'bg-success'}`}>
+                {isFault ? "불량" : "정상"}
               </span>
             </td>
+            <td>{item.predicted_fault || "N/A"}</td> {/* 불량 유형 또는 "정상" */}
+            
+            {/* 진동 값 대신 mean, stddev 표시 */}
             <td>
-              <CircularProgressbar
-                value={rms}
-                maxValue={500}
-                text={`${rms.toFixed(1)}`}
-                styles={buildStyles({
-                  pathColor: statusInfo.color,
-                  textColor: "#000",
-                  trailColor: "#eee",
-                })}
-              />
-              <div className="text-center mt-1" style={{ color: statusInfo.color }}>
-                <strong>{statusInfo.label}</strong>
-              </div>
+              {item.features ? (
+                <div className="small">
+                  Mean: {item.features.mean?.toFixed(2) || "N/A"}<br />
+                  StdDev: {item.features.stddev?.toFixed(2) || "N/A"}
+                </div>
+              ) : "N/A"}
             </td>
-            <td>
-              <div className="small text-muted">
-                mean: {item.features.mean.toFixed(1)}<br />
-                std: {item.features.stddev.toFixed(1)}
-              </div>
+
+            {/* RMS 신호등 시각화 */}
+            <td className="text-center">
+              {rmsValue !== undefined ? (
+                <div style={{ width: "80px", margin: "0 auto" }}>
+                  <CircularProgressbar
+                    value={rmsValue}
+                    maxValue={3000} // RMS 값의 최대 범위에 따라 조정 필요
+                    text={`${rmsValue.toFixed(0)}`}
+                    styles={buildStyles({
+                      pathColor: getColorByRMS(rmsValue),
+                      textColor: "#000",
+                      trailColor: "#eee",
+                    })}
+                  />
+                  <div
+                    className="small"
+                    style={{
+                      color: getColorByRMS(rmsValue),
+                      fontWeight: "bold",
+                      marginTop: "5px",
+                    }}
+                  >
+                    {getLabelByRMS(rmsValue)}
+                  </div>
+                </div>
+              ) : (
+                "N/A" // RMS 데이터가 없는 경우
+              )}
             </td>
           </tr>
         );

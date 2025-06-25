@@ -1,8 +1,8 @@
 import { useEffect, memo, Fragment, useContext } from "react";
-import { useLocation, Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 //react-shepherd
-import {  ShepherdTourContext } from "react-shepherd";
+import { ShepherdTourContext } from "react-shepherd";
 
 //react-bootstrap
 import { Button } from "react-bootstrap";
@@ -21,6 +21,7 @@ import Footer from "../../components/partials/dashboard/FooterStyle/footer";
 
 //default
 // import {DefaultRouter} from '../../router/default-router'
+
 //seetingoffCanvas
 import SettingOffCanvas from "../../components/setting/SettingOffCanvas";
 
@@ -32,7 +33,6 @@ import * as SettingSelector from "../../store/setting/selectors";
 // Redux Selector / Action
 import { useSelector } from "react-redux";
 
-
 const Tour = () => {
   const tour = useContext(ShepherdTourContext);
   const { pathname } = useLocation();
@@ -43,15 +43,13 @@ const Tour = () => {
     ) {
       tour?.start();
     }
-  });
+  }, [pathname, tour]);
   return <Fragment></Fragment>;
 };
 
-const Default = memo((props) => {
-  // let location = useLocation();
-  // const pageLayout = useSelector(SettingSelector.page_layout);
+const Default = memo(({ children }) => {
   const appName = useSelector(SettingSelector.app_name);
-  useEffect(() => {});
+  const location = useLocation();
 
   // const closeTour = () => {
   //   sessionStorage.setItem("tour", "true");
@@ -130,29 +128,31 @@ const Default = memo((props) => {
   //     cancel: function () {},
   //   },
   // };
-  // var subHeader = "";
-  // var commanclass = "";
-  // switch (location.pathname) {
-  //   case '/dashboard':
-  //   case "/dashboard/special-pages/calender":
-  //   case "/dashboard/special-pages/billing":
-  //   case "/dashboard/special-pages/kanban":
-  //   case "/dashboard/special-pages/pricing":
-  //   case "/dashboard/special-pages/timeline":
-  //   case "/dashboard/table/table-data":
-  //   case "/dashboard/table/bootstrap-table":
-  //   case "/dashboard/table/border-table":
-  //   case "/dashboard/table/fancy-table":
-  //   case "/dashboard/table/fixed-table":
-  //   case "/dashboard/icon/solid":
-  //   case "/dashboard/icon/outline":
-  //   case "/dashboard/icon/dual-tone":
-  //     subHeader = <SubHeader />;
-  //     commanclass = "iq-banner default";
-  //     break;
-  //   default:
-  //     break;
-  // }
+
+  var subHeader = "";
+  var commanclass = "";
+
+  switch (location.pathname) {
+    case "/dashboard":
+    case "/dashboard/special-pages/calender":
+    case "/dashboard/special-pages/billing":
+    case "/dashboard/special-pages/kanban":
+    case "/dashboard/special-pages/pricing":
+    case "/dashboard/special-pages/timeline":
+    case "/dashboard/table/table-data":
+    case "/dashboard/table/bootstrap-table":
+    case "/dashboard/table/border-table":
+    case "/dashboard/table/fancy-table":
+    case "/dashboard/table/fixed-table":
+    case "/dashboard/icon/solid":
+    case "/dashboard/icon/outline":
+    case "/dashboard/icon/dual-tone":
+      subHeader = <SubHeader />;
+      commanclass = "iq-banner default";
+      break;
+    default:
+      break;
+  }
 
   return (
     <Fragment>
@@ -162,12 +162,14 @@ const Default = memo((props) => {
       <main className="main-content">
         <div className="position-relative">
           <Header />
-          <SubHeader />
+          {subHeader}
         </div>
-        <div className="py-0 conatiner-fluid content-inner mt-n5">
-          {/* <DefaultRouter /> */}
-          <Outlet />
+
+        {/* ✅ 핵심 변경: children 렌더링 */}
+        <div className="py-0 container-fluid content-inner mt-n5">
+          {children}
         </div>
+
         <Footer />
       </main>
       <SettingOffCanvas />

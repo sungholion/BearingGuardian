@@ -88,3 +88,26 @@ async def predict_faults_from_csv_endpoint(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"CSV Prediction Error: {e}")
         raise HTTPException(status_code=500, detail="CSV 예측 처리 실패")
+    
+
+@router.get("/fault-summary")
+def get_fault_summary():
+    session = SessionLocal()
+    try:
+        results = (
+            session.query(VibrationResult.predicted_fault)
+            .all()
+        )
+        fault_counts = {}
+        for row in results:
+            fault = row.predicted_fault
+            fault_counts[fault] = fault_counts.get(fault, 0) + 1
+
+        return {
+            "total": sum(fault_counts.values()),
+            "summary": fault_counts
+        }
+    finally:
+        session.close()
+
+__all__ = ["router"]
