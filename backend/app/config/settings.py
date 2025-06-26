@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     
     # 애플리케이션 정보
     app_name: str = "BearingGuardian"
-    app_version: str = "1.0.0"
-    debug: bool = True
+    app_version: str = "1.0.0" # 첫 번째 버전
+    debug: bool = True # 개발 중 : True, 배포 중 : False
     
     # API 설정
     api_prefix: str = "/api/v1"
@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     
     # 로깅 설정
     log_level: str = "INFO"
-    log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    
+    # log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    log_format: str = "%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d (%(funcName)s) - %(message)s"
     # 파일 업로드 설정
     max_file_size: int = 50 * 1024 * 1024  # 50MB
     allowed_file_types: list = [".wav", ".csv"]

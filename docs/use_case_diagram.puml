@@ -1,0 +1,132 @@
+@startuml BearingGuardian_UseCase_Diagram
+
+!theme plain
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+' 한글 폰트 설정
+skinparam defaultFontName "Malgun Gothic"
+skinparam defaultFontSize 12
+skinparam titleFontName "Malgun Gothic"
+skinparam titleFontSize 16
+
+title 베어링 가디언 시스템 - Use Case 다이어그램\n(Hadoop, Spark, Kafka 기반)
+
+' 액터 정의
+actor "시스템 관리자" as Admin
+actor "운영자" as Operator
+actor "분석가" as Analyst
+actor "베어링 센서" as Sensor
+actor "알림 시스템" as Notification
+
+' 시스템 경계
+rectangle "베어링 가디언 시스템" {
+    
+    ' 데이터 수집 및 스트리밍
+    package "데이터 수집 레이어" {
+        usecase "실시간 센서 데이터 수집" as UC1
+        usecase "데이터 검증 및 필터링" as UC2
+        usecase "Kafka 토픽으로 데이터 전송" as UC3
+    }
+    
+    ' 데이터 저장 및 처리
+    package "데이터 처리 레이어" {
+        usecase "HDFS에 데이터 저장" as UC4
+        usecase "Spark Streaming으로 실시간 처리" as UC5
+        usecase "배치 데이터 처리" as UC6
+        usecase "데이터 전처리 및 정규화" as UC7
+    }
+    
+    ' 머신러닝 및 분석
+    package "분석 및 예측 레이어" {
+        usecase "실시간 이상 감지" as UC8
+        usecase "베어링 상태 예측" as UC9
+        usecase "고장 예측 모델 학습" as UC10
+        usecase "성능 지표 계산" as UC11
+    }
+    
+    ' 모니터링 및 알림
+    package "모니터링 레이어" {
+        usecase "시스템 상태 모니터링" as UC12
+        usecase "베어링 상태 대시보드" as UC13
+        usecase "알림 생성 및 전송" as UC14
+        usecase "경고 레벨 설정" as UC15
+    }
+    
+    ' 관리 및 설정
+    package "관리 레이어" {
+        usecase "시스템 설정 관리" as UC16
+        usecase "사용자 권한 관리" as UC17
+        usecase "모델 버전 관리" as UC18
+        usecase "시스템 백업 및 복구" as UC19
+    }
+    
+    ' 보고서 및 분석
+    package "보고서 레이어" {
+        usecase "정기 보고서 생성" as UC20
+        usecase "트렌드 분석" as UC21
+        usecase "성능 리포트 생성" as UC22
+        usecase "예측 정확도 분석" as UC23
+    }
+}
+
+' 관계 정의
+' 센서 관련
+Sensor --> UC1
+Sensor --> UC2
+
+' 관리자 관련
+Admin --> UC16
+Admin --> UC17
+Admin --> UC18
+Admin --> UC19
+Admin --> UC15
+
+' 운영자 관련
+Operator --> UC12
+Operator --> UC13
+Operator --> UC14
+Operator --> UC20
+Operator --> UC22
+
+' 분석가 관련
+Analyst --> UC21
+Analyst --> UC23
+Analyst --> UC10
+Analyst --> UC11
+
+' 알림 시스템
+UC14 --> Notification
+
+' 내부 관계 (데이터 플로우)
+UC1 ..> UC2 : <<include>>
+UC2 ..> UC3 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC3 ..> UC5 : <<include>>
+UC4 ..> UC6 : <<include>>
+UC5 ..> UC7 : <<include>>
+UC6 ..> UC7 : <<include>>
+UC7 ..> UC8 : <<include>>
+UC7 ..> UC9 : <<include>>
+UC7 ..> UC10 : <<include>>
+UC8 ..> UC11 : <<include>>
+UC9 ..> UC11 : <<include>>
+UC8 ..> UC12 : <<include>>
+UC9 ..> UC12 : <<include>>
+UC12 ..> UC13 : <<include>>
+UC12 ..> UC14 : <<include>>
+UC10 ..> UC18 : <<include>>
+
+' 기술 스택 표시
+note right of UC3 : Kafka\n(메시지 브로커)
+note right of UC4 : Hadoop HDFS\n(분산 파일 시스템)
+note right of UC5 : Spark Streaming\n(실시간 처리)
+note right of UC6 : Spark Batch\n(배치 처리)
+note right of UC8 : MLlib\n(머신러닝)
+note right of UC9 : MLlib\n(예측 모델)
+
+@enduml 
