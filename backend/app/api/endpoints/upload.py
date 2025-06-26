@@ -22,7 +22,7 @@ async def upload_wav_file(file: UploadFile = File(...)) -> UploadResponse:
     WAV 파일 업로드 및 피처 추출
     """
     try:
-        if not file.filename.lower().endswith('.wav'):
+        if not file.filename or not file.filename.lower().endswith('.wav'):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="WAV 파일만 업로드 가능합니다.")
         
         content = await file.read()
