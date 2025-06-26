@@ -51,7 +51,7 @@ def create_app() -> FastAPI:
     # API 라우터 등록
     app.include_router(api_router, prefix=settings.api_prefix)
     
-    # 헬스체크 엔드포인트
+    # 헬스체크 엔드포인트 - 서버 살아있는지지
     @app.get("/health")
     async def health_check():
         """헬스체크 엔드포인트"""

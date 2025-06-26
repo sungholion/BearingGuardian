@@ -33,12 +33,14 @@ class DatabaseConfig(BaseSettings):
     @property
     def connection_string(self) -> str:
         """SQLAlchemy 연결 문자열 생성"""
-        return f"mysql+pymysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
+        # MySQL 8.0+ 인증 문제 해결을 위한 파라미터 추가
+        return f"mysql+pymysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}?charset=utf8mb4"
     
     @property
     def async_connection_string(self) -> str:
         """비동기 SQLAlchemy 연결 문자열 생성"""
-        return f"mysql+aiomysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
+        # MySQL 8.0+ 인증 문제 해결을 위한 파라미터 추가
+        return f"mysql+aiomysql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}?charset=utf8mb4"
     
     def get_connection_string(self, async_mode: bool = False) -> str:
         """

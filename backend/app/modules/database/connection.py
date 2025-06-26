@@ -32,8 +32,8 @@ class DatabaseManager:
     def _initialize_engine(self):
         """SQLAlchemy 엔진 초기화"""
         try:
-            # 연결 문자열 생성
-            connection_string = db_config.connection_string
+            # 기본 연결 문자열 생성
+            connection_string = f"mysql+pymysql://{db_config.username}:{db_config.password}@{db_config.host}:{db_config.port}/{db_config.database}"
             
             # 엔진 생성 (연결 풀 설정 포함)
             self.engine = create_engine(

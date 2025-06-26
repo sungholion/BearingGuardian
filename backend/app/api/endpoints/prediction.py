@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from typing import Dict, List, Any, Optional
 import numpy as np
 import logging
+from datetime import datetime
 
 from ...modules.predictor.predictor import Predictor
 from ...modules.database.repository import VibrationRepository
@@ -65,6 +66,14 @@ async def predict_fault(
         
         saved_result = repository.save_prediction(features_dict, prediction_result)
         
+        # datetime을 문자열로 변환
+        prediction_time_str = None
+        if saved_result["predicted_time"]:
+            if isinstance(saved_result["predicted_time"], datetime):
+                prediction_time_str = saved_result["predicted_time"].isoformat()
+            else:
+                prediction_time_str = str(saved_result["predicted_time"])
+        
         # 응답 생성
         response = PredictionResponse(
             prediction_id=saved_result["result_id"],
@@ -72,7 +81,7 @@ async def predict_fault(
             confidence=prediction_result["confidence"],
             probabilities=prediction_result["probabilities"],
             features=features_dict,
-            prediction_time=saved_result["predicted_time"]
+            prediction_time=prediction_time_str
         )
         
         logger.info(f"예측 완료: {prediction_result['predicted_label']} (신뢰도: {prediction_result['confidence']:.3f})")
@@ -133,13 +142,21 @@ async def predict_fault_batch(
             
             saved_result = repository.save_prediction(features_dict, prediction_result)
             
+            # datetime을 문자열로 변환
+            prediction_time_str = None
+            if saved_result["predicted_time"]:
+                if isinstance(saved_result["predicted_time"], datetime):
+                    prediction_time_str = saved_result["predicted_time"].isoformat()
+                else:
+                    prediction_time_str = str(saved_result["predicted_time"])
+            
             response = PredictionResponse(
                 prediction_id=saved_result["result_id"],
                 predicted_label=prediction_result["predicted_label"],
                 confidence=prediction_result["confidence"],
                 probabilities=prediction_result["probabilities"],
                 features=features_dict,
-                prediction_time=saved_result["predicted_time"]
+                prediction_time=prediction_time_str
             )
             responses.append(response)
         
