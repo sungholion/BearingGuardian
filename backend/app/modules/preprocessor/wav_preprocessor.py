@@ -8,7 +8,7 @@ features for bearing fault prediction.
 import numpy as np
 from scipy.io import wavfile
 from scipy.stats import skew, kurtosis
-from scipy.fft import fft, fftfreq
+from numpy.fft import fft, fftfreq
 from typing import Dict, Tuple, Optional, Union
 import logging
 import tempfile
