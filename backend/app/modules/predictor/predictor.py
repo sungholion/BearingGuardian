@@ -1,7 +1,7 @@
 """
-Predictor Module
+예측 모듈
 
-This module provides functionality for making predictions using pre-trained models.
+이 모듈은 사전 훈련된 모델을 사용하여 예측을 수행하는 기능을 제공합니다.
 """
 
 import numpy as np
@@ -14,13 +14,12 @@ from ..model_loader.model_loader import ModelLoader
 
 logger = logging.getLogger(__name__)
 
-
-class Predictor:
-    """
+"""
     베어링 고장 예측 클래스
     
     전처리된 피처를 받아서 ML 모델을 통해 고장 유형을 예측합니다.
-    """
+"""
+class Predictor:
     
     def __init__(self, model_loader: Optional[ModelLoader] = None):
         """

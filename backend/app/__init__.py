@@ -14,6 +14,7 @@ from .config.settings import settings # app/config/settings.py에 있는 Setting
 from .api.routes import api_router # app/api/routes.py에 있는 api_router 객체
 
 
+### 애플리케이션 생성 함수 시작
 def create_app() -> FastAPI:
     """FastAPI 애플리케이션 생성"""
     
@@ -27,7 +28,28 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name, # BearingGuardian
         version=settings.app_version, # 1.0.0
-        description="베어링 진동 기반 결함 유형 및 잔여 수명 예측 시스템 API",
+        description="""
+        # BearingGuardian API
+        
+        베어링 진동 데이터를 분석하여 고장 유형을 예측하는 머신러닝 기반 시스템입니다.
+        
+        ## 주요 기능
+        - 🎯 **실시간 고장 예측**: 진동 데이터로 즉시 고장 유형 분석
+        - 📊 **배치 처리**: 여러 데이터 일괄 분석
+        - 📈 **통계 정보**: 예측 히스토리 및 성능 지표
+        - 🎵 **오디오 처리**: WAV 파일 업로드 및 분석
+        
+        ## 지원하는 고장 유형
+        - 정상 (Normal)
+        - 내륜 고장 (Inner Race Fault)
+        - 외륜 고장 (Outer Race Fault)
+        - 볼 고장 (Ball Fault)
+        
+        ## 사용 방법
+        1. 진동 데이터의 13개 특성값을 입력
+        2. API 호출로 고장 유형 예측
+        3. 신뢰도와 확률 정보 확인
+        """,
         docs_url="/docs", #  Swagger 페이지 경로
         redoc_url="/redoc", # UI 다른 문서 페이지 경로
         debug=settings.debug # 개발 중 : True, 배포 중 : False
@@ -73,7 +95,7 @@ def create_app() -> FastAPI:
         }
     
     return app
-
+### 애플리케이션 생성 함수 끝
 
 # 애플리케이션 인스턴스 생성
 app = create_app()

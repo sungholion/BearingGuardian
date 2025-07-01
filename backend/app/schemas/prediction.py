@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 
 class PredictionRequest(BaseModel):
+    """베어링 고장 예측 요청 모델
+    
+    진동 데이터에서 추출된 13개 특성값을 입력받아 베어링의 고장 유형을 예측합니다.
+    """
     mean: float
     stddev: float
     rms: float

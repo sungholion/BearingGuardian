@@ -17,16 +17,15 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-
+"""
+WAV 파일 전처리 및 피처 추출 클래스
+    
+베어링 진동 데이터의 WAV 파일에서 시간 영역 및 주파수 영역 피처를 추출합니다.
+"""
 class WAVPreprocessor:
-    """
-    WAV 파일 전처리 및 피처 추출 클래스
-    
-    베어링 진동 데이터의 WAV 파일에서 시간 영역 및 주파수 영역 피처를 추출합니다.
-    """
-    
+
+    """WAV 전처리기 초기화"""
     def __init__(self):
-        """WAV 전처리기 초기화"""
         self.feature_names = [
             # 시간 영역 피처 (9개)
             "mean", "stddev", "rms", "max", "min", "ptp",
@@ -34,9 +33,9 @@ class WAVPreprocessor:
             # 주파수 영역 피처 (4개)
             "freq_mean", "freq_stddev", "freq_centroid", "freq_bandwidth"
         ]
+
     
-    def load_wav_file(self, file_path: Union[str, Path]) -> Tuple[np.ndarray, int]:
-        """
+    """
         WAV 파일을 로드합니다.
         
         Args:
@@ -48,7 +47,9 @@ class WAVPreprocessor:
         Raises:
             FileNotFoundError: 파일이 존재하지 않는 경우
             ValueError: WAV 파일 형식이 올바르지 않은 경우
-        """
+    """
+    def load_wav_file(self, file_path: Union[str, Path]) -> Tuple[np.ndarray, int]:
+       
         try:
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"WAV 파일을 찾을 수 없습니다: {file_path}")
@@ -65,8 +66,9 @@ class WAVPreprocessor:
             logger.error(f"WAV 파일 로드 실패: {e}")
             raise ValueError(f"WAV 파일 로드 중 오류 발생: {e}")
     
-    def extract_time_domain_features(self, signal: np.ndarray) -> Dict[str, float]:
-        """
+
+
+    """
         시간 영역 피처를 추출합니다.
         
         Args:
@@ -74,7 +76,8 @@ class WAVPreprocessor:
             
         Returns:
             Dict[str, float]: 시간 영역 피처 딕셔너리
-        """
+    """
+    def extract_time_domain_features(self, signal: np.ndarray) -> Dict[str, float]:
         try:
             # 기본 통계 피처
             mean = np.mean(signal)
@@ -114,8 +117,8 @@ class WAVPreprocessor:
             logger.error(f"시간 영역 피처 추출 실패: {e}")
             raise ValueError(f"시간 영역 피처 추출 중 오류 발생: {e}")
     
-    def extract_frequency_domain_features(self, signal: np.ndarray, sampling_rate: int) -> Dict[str, float]:
-        """
+
+    """
         주파수 영역 피처를 추출합니다.
         
         Args:
@@ -124,7 +127,9 @@ class WAVPreprocessor:
             
         Returns:
             Dict[str, float]: 주파수 영역 피처 딕셔너리
-        """
+    """
+    def extract_frequency_domain_features(self, signal: np.ndarray, sampling_rate: int) -> Dict[str, float]:
+       
         try:
             # FFT 계산
             fft_vals = np.abs(fft(signal))
@@ -167,8 +172,10 @@ class WAVPreprocessor:
             logger.error(f"주파수 영역 피처 추출 실패: {e}")
             raise ValueError(f"주파수 영역 피처 추출 중 오류 발생: {e}")
     
-    def extract_all_features(self, signal: np.ndarray, sampling_rate: int) -> Dict[str, float]:
-        """
+
+
+
+    """
         모든 피처를 추출합니다 (시간 영역 + 주파수 영역).
         
         Args:
@@ -177,7 +184,8 @@ class WAVPreprocessor:
             
         Returns:
             Dict[str, float]: 모든 피처를 포함한 딕셔너리
-        """
+    """
+    def extract_all_features(self, signal: np.ndarray, sampling_rate: int) -> Dict[str, float]:
         try:
             time_features = self.extract_time_domain_features(signal)
             freq_features = self.extract_frequency_domain_features(signal, sampling_rate)
@@ -195,8 +203,10 @@ class WAVPreprocessor:
             logger.error(f"피처 추출 실패: {e}")
             raise ValueError(f"피처 추출 중 오류 발생: {e}")
     
-    def features_to_array(self, features: Dict[str, float]) -> np.ndarray:
-        """
+
+
+
+    """
         피처 딕셔너리를 numpy 배열로 변환합니다.
         
         Args:
@@ -204,7 +214,8 @@ class WAVPreprocessor:
             
         Returns:
             np.ndarray: 피처 배열 (1, 13) 형태
-        """
+    """
+    def features_to_array(self, features: Dict[str, float]) -> np.ndarray:
         try:
             # 피처 순서 보장
             feature_values = [features[name] for name in self.feature_names]
@@ -216,8 +227,9 @@ class WAVPreprocessor:
             logger.error(f"피처 배열 변환 실패: {e}")
             raise ValueError(f"피처 배열 변환 중 오류 발생: {e}")
     
-    def process_wav_file(self, file_path: Union[str, Path]) -> Tuple[np.ndarray, int, Dict[str, float]]:
-        """
+
+
+    """
         WAV 파일을 완전히 처리합니다.
         
         Args:
@@ -225,7 +237,8 @@ class WAVPreprocessor:
             
         Returns:
             Tuple[np.ndarray, int, Dict[str, float]]: (피처 배열, 샘플링 레이트, 피처 딕셔너리)
-        """
+    """
+    def process_wav_file(self, file_path: Union[str, Path]) -> Tuple[np.ndarray, int, Dict[str, float]]:
         try:
             # WAV 파일 로드
             signal, sampling_rate = self.load_wav_file(file_path)
@@ -243,8 +256,8 @@ class WAVPreprocessor:
             logger.error(f"WAV 파일 처리 실패: {e}")
             raise ValueError(f"WAV 파일 처리 중 오류 발생: {e}")
     
-    def process_uploaded_file(self, file_content: bytes, filename: str) -> Tuple[np.ndarray, int, Dict[str, float]]:
-        """
+
+    """
         업로드된 파일을 처리합니다.
         
         Args:
@@ -253,7 +266,8 @@ class WAVPreprocessor:
             
         Returns:
             Tuple[np.ndarray, int, Dict[str, float]]: (피처 배열, 샘플링 레이트, 피처 딕셔너리)
-        """
+    """
+    def process_uploaded_file(self, file_content: bytes, filename: str) -> Tuple[np.ndarray, int, Dict[str, float]]:
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
                 temp_file.write(file_content)
@@ -271,17 +285,18 @@ class WAVPreprocessor:
             logger.error(f"업로드 파일 처리 실패: {e}")
             raise ValueError(f"업로드 파일 처리 중 오류 발생: {e}")
     
-    def get_feature_names(self) -> list:
-        """
+
+    """
         피처 이름 목록을 반환합니다.
         
         Returns:
             list: 피처 이름 리스트
-        """
+    """
+    def get_feature_names(self) -> list:
         return self.feature_names.copy()
     
-    def validate_features(self, features: Dict[str, float]) -> bool:
-        """
+    
+    """
         추출된 피처의 유효성을 검증합니다.
         
         Args:
@@ -289,7 +304,8 @@ class WAVPreprocessor:
             
         Returns:
             bool: 유효성 검증 결과
-        """
+    """
+    def validate_features(self, features: Dict[str, float]) -> bool:
         try:
             # 필수 피처 존재 확인
             for name in self.feature_names:

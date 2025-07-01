@@ -39,9 +39,29 @@ async def predict_fault(
     repository: VibrationRepository = Depends(get_repository)
 ) -> PredictionResponse:
     """
-    베어링 고장 예측
+    🎯 **베어링 고장 예측**
     
-    추출된 피처를 받아서 베어링 고장 유형을 예측합니다.
+    진동 데이터에서 추출된 13개 특성값을 입력받아 베어링의 고장 유형을 예측합니다.
+    
+    **입력 특성값:**
+    - `mean`: 평균값
+    - `stddev`: 표준편차
+    - `rms`: RMS (Root Mean Square)
+    - `max`: 최대값
+    - `min`: 최소값
+    - `ptp`: Peak-to-Peak
+    - `skewness`: 왜도
+    - `kurtosis`: 첨도
+    - `crest_factor`: 크레스트 팩터
+    - `freq_mean`: 주파수 평균
+    - `freq_stddev`: 주파수 표준편차
+    - `freq_centroid`: 주파수 중심
+    - `freq_bandwidth`: 주파수 대역폭
+    
+    **예측 결과:**
+    - 고장 유형 (정상/내륜/외륜/볼 고장)
+    - 신뢰도 (0~1)
+    - 각 고장 유형별 확률
     """
     try:
         # 피처를 numpy 배열로 변환

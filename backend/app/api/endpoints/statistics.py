@@ -1,6 +1,4 @@
 """
-Statistics API Endpoints
-
 예측 통계 조회 관련 API 엔드포인트
 """
 
