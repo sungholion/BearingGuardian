@@ -1,0 +1,6 @@
+flask
+flask-socketio
+kafka-python
+python-engineio
+python-socketio
+redis
