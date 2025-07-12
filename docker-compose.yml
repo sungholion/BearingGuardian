@@ -25,12 +25,21 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   producer:
     build: ./producer
+    environment:
+      - PYTHONPATH=/app
     container_name: producer
+    command: python producer.py
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
 
   flask-app:
     build: ./flask-app
@@ -38,14 +47,21 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - kafka
-      - redis
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   redis:
     image: "redis:alpine"
     container_name: redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -69,6 +85,7 @@ services:
       HDFS_NAMENODE_HOST: namenode
     networks:
       - hadoop-network
+      - default
 
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8

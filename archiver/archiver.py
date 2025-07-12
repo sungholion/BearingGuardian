@@ -20,28 +20,42 @@ def archive_data():
     print(f"[{datetime.now()}] Archiving data to HDFS: {hdfs_path}")
 
     try:
-        all_keys = r.keys('*')
-        if not all_keys:
-            print(f"[{datetime.now()}] No data in Redis to archive.")
+        # Check current number of keys in Redis
+        current_keys_count = r.dbsize()
+        if current_keys_count < 3:
+            print(f"[{datetime.now()}] Not enough data in Redis to archive. Current: {current_keys_count} keys.")
             return
 
         data_to_archive = {}
-        for key in all_keys:
+        keys_to_delete = []
+        count = 0
+        for key in r.scan_iter():
             data_to_archive[key] = r.get(key)
+            keys_to_delete.append(key)
+            count += 1
+            if count >= 3:
+                break
+
+        if not data_to_archive:
+            print(f"[{datetime.now()}] No data to archive after checking count.")
+            return
 
         json_data = json.dumps(data_to_archive, indent=2)
 
         with hdfs_client.write(hdfs_path, encoding='utf-8') as writer:
             writer.write(json_data)
 
-        print(f"[{datetime.now()}] Successfully archived {len(all_keys)} keys to HDFS.")
+        print(f"[{datetime.now()}] Successfully archived {len(data_to_archive)} keys to HDFS.")
 
-        # Clear Redis after successful archive
-        r.flushdb()
-        print(f"[{datetime.now()}] Redis flushed.")
+        # Delete archived keys from Redis
+        if keys_to_delete:
+            r.delete(*keys_to_delete)
+            print(f"[{datetime.now()}] Deleted {len(keys_to_delete)} keys from Redis.")
 
     except Exception as e:
-        print(f"[{datetime.now()}] Error during archiving: {e}")
+        print(f"[{datetime.now()}] Error during archiving: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     # Simple loop to run daily (for demonstration, in production use a proper scheduler like cron)
