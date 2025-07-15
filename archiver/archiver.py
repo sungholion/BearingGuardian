@@ -14,43 +14,35 @@ def archive_data():
     r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     hdfs_client = InsecureClient(f'http://{HDFS_NAMENODE_HOST}:{HDFS_NAMENODE_PORT}', user='root')
 
-    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    hdfs_path = f'/redis_archive/data_{current_time}.json'
+    # Ensure HDFS directory exists
+    if not hdfs_client.status('/redis_archive', strict=False):
+        hdfs_client.makedirs('/redis_archive')
 
-    print(f"[{datetime.now()}] Archiving data to HDFS: {hdfs_path}")
+    print(f"[{datetime.now()}] Archiving data to HDFS")
 
     try:
-        # Check current number of keys in Redis
-        current_keys_count = r.dbsize()
-        if current_keys_count < 3:
-            print(f"[{datetime.now()}] Not enough data in Redis to archive. Current: {current_keys_count} keys.")
-            return
-
-        data_to_archive = {}
-        keys_to_delete = []
-        count = 0
-        for key in r.scan_iter():
-            data_to_archive[key] = r.get(key)
-            keys_to_delete.append(key)
-            count += 1
-            if count >= 3:
-                break
+        # Get all data from the list
+        data_to_archive = r.lrange('sensor_data', 0, -1)
 
         if not data_to_archive:
-            print(f"[{datetime.now()}] No data to archive after checking count.")
+            print(f"[{datetime.now()}] No data to archive.")
             return
 
-        json_data = json.dumps(data_to_archive, indent=2)
+        # Clear the list in Redis
+        r.delete('sensor_data')
 
-        with hdfs_client.write(hdfs_path, encoding='utf-8') as writer:
-            writer.write(json_data)
+        # Archive data to a single JSONL file for the current day
+        current_date = datetime.now().strftime("%Y%m%d")
+        hdfs_path = f'/redis_archive/data_{current_date}.jsonl'
 
-        print(f"[{datetime.now()}] Successfully archived {len(data_to_archive)} keys to HDFS.")
+        # Append to the file if it exists, otherwise create a new one
+        mode = 'ab' if hdfs_client.status(hdfs_path, strict=False) else 'wb'
 
-        # Delete archived keys from Redis
-        if keys_to_delete:
-            r.delete(*keys_to_delete)
-            print(f"[{datetime.now()}] Deleted {len(keys_to_delete)} keys from Redis.")
+        with hdfs_client.write(hdfs_path, encoding='utf-8', overwrite=False, append=True) as writer:
+            for item_str in data_to_archive:
+                writer.write(item_str + '\n')
+
+        print(f"[{datetime.now()}] Successfully archived {len(data_to_archive)} items to HDFS: {hdfs_path}")
 
     except Exception as e:
         print(f"[{datetime.now()}] Error during archiving: {e}", flush=True)
@@ -58,8 +50,7 @@ def archive_data():
         traceback.print_exc()
 
 if __name__ == "__main__":
-    # Simple loop to run daily (for demonstration, in production use a proper scheduler like cron)
     while True:
         archive_data()
-        print(f"[{datetime.now()}] Next archive in 24 hours...")
+        print(f"[{datetime.now()}] Next archive in 60 seconds...")
         time.sleep(60) # Sleep for 60 seconds
