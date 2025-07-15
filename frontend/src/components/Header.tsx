@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router'; // useRouter 훅을 import 합니다.
 
 const BellIcon = () => (
   <svg width="25" height="25" fill="none" stroke="#2563eb" strokeWidth="2" viewBox="0 0 24 24">
@@ -20,7 +21,8 @@ const menus = [
 ];
 
 export default function Header() {
-  const activePath = "/"; // 실제 서비스는 useRouter().pathname 등 사용
+  const router = useRouter(); // useRouter 훅을 초기화합니다.
+  const activePath = router.pathname; // 현재 페이지의 경로를 가져와 activePath에 할당합니다.
 
   return (
     <div
@@ -69,7 +71,7 @@ export default function Header() {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 50, 
+        gap: 50,
       }}>
         {/* 메뉴 3개 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 35 }}>
@@ -92,8 +94,9 @@ export default function Header() {
                   e.currentTarget.style.color = "#1a3184";
                 }}
                 onMouseOut={e => {
+                  // 현재 활성 경로와 일치하지 않을 때만 원래 색상으로 되돌립니다.
                   e.currentTarget.style.background = "none";
-                  e.currentTarget.style.color = m.link === activePath ? "#1646d9" : "#2563eb";
+                  e.currentTarget.style.color = m.link === activePath ? "#1646d9" : "#727171ff"; // 원래 색상으로 변경
                 }}
               >
                 {m.name}
@@ -151,8 +154,10 @@ export default function Header() {
           }}>
             <UserIcon />
           </div>
+          
         </div>
       </div>
     </div>
+    
   );
 }
