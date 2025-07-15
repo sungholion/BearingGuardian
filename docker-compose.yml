@@ -197,6 +197,8 @@ services:
     ports:
       - "8088:8080" # Spark Master Web UI
       - "7077:7077" # Spark Master internal communication
+    volumes:
+      - ./core-site.xml:/opt/spark/conf/core-site.xml
     environment:
       SPARK_MODE: master
       SPARK_RPC_AUTHENTICATION_ENABLED: "no"
@@ -207,6 +209,7 @@ services:
       SPARK_MASTER_PORT: 7077
       SPARK_MASTER_HOST: spark-master
       SPARK_MASTER_OPTS: "-Dspark.deploy.defaultCores=1 -Dspark.deploy.defaultMemory=1g"
+      HADOOP_CONF_DIR: /opt/spark/conf
     depends_on:
       namenode:
         condition: service_started
@@ -222,6 +225,8 @@ services:
     depends_on:
       spark-master:
         condition: service_started
+    volumes:
+      - ./core-site.xml:/opt/spark/conf/core-site.xml
     environment:
       SPARK_MODE: worker
       SPARK_MASTER: spark://spark-master:7077
@@ -231,6 +236,7 @@ services:
       SPARK_RPC_ENCRYPTION_ENABLED: "no"
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
       SPARK_SSL_ENABLED: "no"
+      HADOOP_CONF_DIR: /opt/spark/conf
     networks:
       - hadoop-network
       - default
