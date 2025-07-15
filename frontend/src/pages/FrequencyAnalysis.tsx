@@ -1,16 +1,17 @@
 'use client';
 
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, // AreaChart와 Area 컴포넌트를 임포트합니다.
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area,
 } from 'recharts';
 
 // 커스텀 레이블 컴포넌트 정의
 const CustomLabel = ({ x, y, stroke, value }) => {
-  // Line 위에 값을 표시할 위치와 스타일 조정
+  const formattedValue = typeof value === 'number' ? value.toFixed(1) : value;
+
   return (
     <text x={x} y={y} dy={-10} fill={stroke} fontSize={12} textAnchor="middle">
-      {value}
+      {formattedValue}
     </text>
   );
 };
@@ -46,6 +47,10 @@ export default function FrequencyAnalysis() {
     { time: '19:30', freq1: 85, freq2: 35 },
   ];
 
+  const colorPreviousPurple = '#A0B3F7';
+  const colorCurrentPurple = '#7B68EE';
+
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300 h-full flex flex-col">
       <div className="flex justify-between items-center">
@@ -55,7 +60,7 @@ export default function FrequencyAnalysis() {
       <p className="text-sm text-gray-600 mb-6">베어링의 실시간 주파수 변화와 평균 변동을 분석합니다</p>
 
       <div className="grid grid-cols-2 gap-6 flex-1">
-        {/* (1) 실시간 주파수 추이 */}
+        {/* (1) 실시간 주파수 추이 - 웨이브폼 차트 (보라색 계열) */}
         <div className="flex flex-col flex-1 min-w-0">
           {/* 타이틀 + 범례 */}
           <div style={{ minHeight: 66 }}>
@@ -65,12 +70,12 @@ export default function FrequencyAnalysis() {
             <div className="flex items-center justify-center mb-2">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-[#69C7C5] mr-2"></div>
+                  <div className="w-3 h-3" style={{ backgroundColor: colorPreviousPurple }}></div>
                   <span className="text-xs text-gray-600">평균</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-[#4477D8] mr-2"></div>
-                  <span className="text-xs text-gray-600">현재</span>
+                  <div className="w-3 h-3" style={{ backgroundColor: colorCurrentPurple }}></div>
+                  <span className="text-xs text-gray-600">실시간</span>
                 </div>
               </div>
             </div>
@@ -79,41 +84,60 @@ export default function FrequencyAnalysis() {
           <div className="flex-1 border border-gray-300 rounded-lg flex items-center justify-center overflow-x-auto min-w-0 p-0">
             <div className="w-full min-w-[400px] max-w-[600px] h-[420px] mx-auto">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
+                <AreaChart
                   data={realtimeData}
                   margin={{ top: 24, right: 24, left: 0, bottom: 16 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="freq" tick={{ fontSize: 12 }} stroke="#6b7280" />
-                  <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
+                  {/* YAxis domain을 최대 current 또는 previous 값에 맞게 조정 (예: 0부터 12 또는 데이터 최대값 + 여유) */}
+                  <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" domain={[0, 12]} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#f9fafb',
                       border: '1px solid #d1d5db',
                       borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     }}
                   />
-                  <Bar
+                  <defs>
+                    <linearGradient id="gradientPrevious" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={colorPreviousPurple} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={colorPreviousPurple} stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="gradientCurrent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={colorCurrentPurple} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={colorCurrentPurple} stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+
+                  <Area
+                    type="monotone"
                     dataKey="previous"
-                    stackId="a"
-                    fill="#69C7C5"
-                    radius={[0, 0, 0, 0]}
-                    label={{ position: 'insideBottom', fill: '#ffffff', fontSize: 10 }}
+                    // stackId="realtimeStack" // ⚠️ 이 라인을 제거하여 스택 기능을 비활성화합니다.
+                    stroke={colorPreviousPurple}
+                    fill="url(#gradientPrevious)"
+                    strokeWidth={2}
+                    dot={{ fill: colorPreviousPurple, r: 3 }}
+                    label={<CustomLabel />}
                   />
-                  <Bar
+                  <Area
+                    type="monotone"
                     dataKey="current"
-                    stackId="a"
-                    fill="#4477D8"
-                    radius={[4, 4, 0, 0]}
-                    label={{ position: 'insideTop', fill: '#ffffff', fontSize: 10 }}
+                    // stackId="realtimeStack" // ⚠️ 이 라인을 제거하여 스택 기능을 비활성화합니다.
+                    stroke={colorCurrentPurple}
+                    fill="url(#gradientCurrent)"
+                    strokeWidth={2}
+                    dot={{ fill: colorCurrentPurple, r: 3 }}
+                    label={<CustomLabel />}
                   />
-                </BarChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
 
-        {/* (2) 주파수 변동(평균) 차트 */}
+        {/* (2) 주파수 변동(평균) 차트 - 기존 색상 유지 */}
         <div className="flex flex-col flex-1 min-w-0 pr-2 sm:pr-0">
           <div style={{ minHeight: 66 }}>
             <h4 className="text-center font-bold text-xl whitespace-nowrap mb-1">
@@ -176,7 +200,7 @@ export default function FrequencyAnalysis() {
                     strokeWidth={3}
                     dot={{ fill: '#4477D8', r: 4 }}
                     fill="url(#colorSales)"
-                    label={<CustomLabel />} // CustomLabel 컴포넌트 적용
+                    label={<CustomLabel />}
                   />
                   <Area
                     type="monotone"
@@ -185,7 +209,7 @@ export default function FrequencyAnalysis() {
                     strokeWidth={3}
                     dot={{ fill: '#69C7C5', r: 4 }}
                     fill="url(#colorCost)"
-                    label={<CustomLabel />} // CustomLabel 컴포넌트 적용
+                    label={<CustomLabel />}
                   />
                 </AreaChart>
               </ResponsiveContainer>
