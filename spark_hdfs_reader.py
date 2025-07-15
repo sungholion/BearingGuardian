@@ -1,24 +1,31 @@
 from pyspark.sql import SparkSession
 
-# Create a SparkSession
-spark = SparkSession.builder \
-    .appName("HDFSJsonReader") \
-    .master("spark://spark-master:7077") \
-    .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9870") \
-    .config("spark.hadoop.ipc.maximum.data.length", "268435456") \
-    .config("spark.sql.files.maxPartitionBytes", "134217728") \
-    .config("spark.sql.files.ignoreCorruptFiles", "true") \
-    .config("spark.hadoop.mapreduce.input.fileinputformat.split.maxsize", "134217728") \
-    .config("spark.hadoop.dfs.client.block.write.locate.max.retries", "10") \
-    .getOrCreate()
+def main():
+    """
+    Main function to read data from HDFS using Spark.
+    """
+    spark = SparkSession.builder \
+        .appName("HDFS Reader") \
+        .getOrCreate()
 
-# Read JSON data from HDFS
-# Ensure the path matches where your archiver service is writing data
-df = spark.read.json("hdfs://namenode:9870/redis_archive/*.jsonl")
+    # Path to the file in HDFS
+    file_path = "hdfs://namenode:8020/test/sample_data.txt"
+    
+    try:
+        # Read the text file from HDFS
+        df = spark.read.text(file_path)
 
-# Show the schema and some data
-df.printSchema()
-df.show()
+        # Show the content of the DataFrame
+        print("Successfully read file from HDFS. Content:")
+        df.show()
 
-# Stop the SparkSession
-spark.stop()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # Stop the SparkSession
+        spark.stop()
+
+if __name__ == "__main__":
+    main()
+
