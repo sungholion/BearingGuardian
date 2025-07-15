@@ -33,9 +33,8 @@ export default function StatusChart() {
         fontSize={12}
         fontWeight="bold"
       >
-        {/* <tspan> 요소를 사용하여 줄 바꿈 구현 */}
-        <tspan x={x} dy="-0.6em">{name}</tspan> {/* 첫 번째 줄 (name) */}
-        <tspan x={x} dy="1.2em">({value}건)</tspan> {/* 두 번째 줄 (value), dy로 상대적인 Y 위치 조정 */}
+        <tspan x={x} dy="-0.6em">{name}</tspan>
+        <tspan x={x} dy="1.2em">({value}%)</tspan>
       </text>
     );
   };
@@ -48,12 +47,11 @@ export default function StatusChart() {
       </div>
       <p className="text-sm text-gray-600 mb-6">베어링 구성 요소별 상태를 분석합니다</p>
 
-      {/* flex-row의 gap을 조절하여 전체 컨테이너 여백 확보 */}
-      {/* items-start로 변경하여 두 차트의 상단이 정렬되도록 함 */}
       <div className="flex flex-row gap-4 flex-1 min-h-[172px] items-start">
         {/* --- 도넛 차트 --- */}
-        <div className="flex flex-col items-center justify-start w-70"> 
-          {/* 도넛 차트 자체의 크기 더 키움: w-56 h-56 */}
+        <div className="flex flex-col items-center justify-start w-70">
+          <h4 className="text-lg font-bold mb-2">누적 품질 현황</h4> {/* 타이틀 */}
+
           <div className="relative w-56 h-56 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -61,8 +59,8 @@ export default function StatusChart() {
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={45} // 굵기 조절
-                  outerRadius={90} // 전체 원의 크기
+                  innerRadius={45}
+                  outerRadius={90}
                   paddingAngle={5}
                   dataKey="value"
                   label={renderCustomizedLabel}
@@ -87,25 +85,21 @@ export default function StatusChart() {
                 />
               </PieChart>
             </ResponsiveContainer>
-            {/* 도넛 중앙 표시 */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <span className="w-3 h-3 bg-red-500 rounded-full inline-block mr-1"></span>
               <span className="text-sm text-red-600 font-bold">위험</span>
             </div>
           </div>
-          <div className="mt-4 text-center">
-            <span className="text-l text-black-600 font-semibold">누적 품질 현황</span>
-          </div>
         </div>
 
-        {/* --- Progress Bar --- */}
-        {/* 프로그레스 바 시작점을 맞추기 위해 top 마진 유지 (pt-4) */}
-        <div className="flex-1 flex flex-col gap-7 justify-start pt-4">
+        <div className="flex-1 flex flex-col gap-7 justify-start">
+          <h4 className="text-lg font-bold mb-2">실시간 불량 건수</h4>
+
           {barList.map(({ label, value, color }) => (
             <div key={label}>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-black-600">{label}</span>
-                <span className="text-xs text-black-500">{value}%</span>
+                <span className="text-xs text-black-500">{value}건</span>
               </div>
               <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
                 <div

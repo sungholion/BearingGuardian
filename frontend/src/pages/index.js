@@ -15,10 +15,10 @@ export default function Home() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
       {/* 좌측 메뉴 */}
-      <Sidebar
+      {/* <Sidebar
         isCollapsed={isCollapsed}
         onToggle={() => setIsCollapsed((v) => !v)}
-      />
+      /> */}
 
       {/* 우측 전체(헤더 + 본문) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
