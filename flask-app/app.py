@@ -35,6 +35,15 @@ def kafka_listener():
 def index():
     return render_template('index.html')
 
+@app.route('/data')
+def show_data():
+    try:
+        with open('sample_data.txt', 'r') as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = "sample_data.txt file not found."
+    return render_template('data.html', data_content=content)
+
 if __name__ == '__main__':
     kafka_thread = threading.Thread(target=kafka_listener)
     kafka_thread.daemon = True
