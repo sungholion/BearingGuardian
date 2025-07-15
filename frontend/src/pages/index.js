@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import BearingInfo from './BearingInfo';
-import StatusChart from './StatusChart';
-import LifePrediction from './LifePrediction';
-import EnvironmentSensor from './EnvironmentSensor';
-import FrequencyAnalysis from './FrequencyAnalysis';
+import Header from '../components/Header';
+import BearingInfo from '../components/BearingInfo';
+import StatusChart from '../components/StatusChart';
+import LifePrediction from '../components/LifePrediction';
+import EnvironmentSensor from '../components/EnvironmentSensor';
+import FrequencyAnalysis from '../components/FrequencyAnalysis';
+
+// ... 이하 코드 동일
+
 
 export default function Home() {
   const [isCollapsed, setIsCollapsed] = useState(false);
