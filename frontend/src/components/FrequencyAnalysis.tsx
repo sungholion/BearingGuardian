@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area,
@@ -10,15 +11,15 @@ const CustomLabel = ({ x, y, stroke, value }) => {
   const formattedValue = typeof value === 'number' ? value.toFixed(1) : value;
 
   return (
-    <text x={x} y={y} dy={-10} fill={stroke} fontSize={12} textAnchor="middle">
-      {formattedValue}
+    <text x={x} y={y} dy={-10} fill="#000000" fontSize={12} textAnchor="middle">
+      {formattedValue} Hz
     </text>
   );
 };
 
 
 export default function FrequencyAnalysis() {
-  const realtimeData = [
+  const initialRealtimeData = [
     { freq: 'S', current: 10, previous: 0.2 },
     { freq: 'M', current: 4.8, previous: 1.5 },
     { freq: 'T', current: 7.5, previous: 3.8 },
@@ -33,6 +34,27 @@ export default function FrequencyAnalysis() {
     { freq: 'F', current: 9.7, previous: 3.1 },
     { freq: 'S', current: 4.8, previous: 3.1 },
   ];
+
+  const [realtimeData, setRealtimeData] = useState(initialRealtimeData);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRealtimeData(prevData =>
+        prevData.map(item => {
+          const newCurrent = parseFloat((item.current + (Math.random() * 2 - 1) * 0.5).toFixed(1)); // +/- 0.5
+          const newPrevious = parseFloat((item.previous + (Math.random() * 2 - 1) * 0.2).toFixed(1)); // +/- 0.2
+
+          return {
+            ...item,
+            current: Math.max(1.0, Math.min(10.0, newCurrent)), // Clamp between 1.0 and 10.0
+            previous: Math.max(0.1, Math.min(4.0, newPrevious)), // Clamp between 0.1 and 4.0
+          };
+        })
+      );
+    }, 1000); // Update every 1 second
+
+    return () => clearInterval(interval);
+  }, []);
 
   const variationData = [
     { time: '15:00', freq1: 70, freq2: 20 },
@@ -89,9 +111,9 @@ export default function FrequencyAnalysis() {
                   margin={{ top: 24, right: 24, left: 0, bottom: 16 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="freq" tick={{ fontSize: 12 }} stroke="#6b7280" />
+                  <XAxis dataKey="freq" tick={{ fontSize: 12 }} stroke="#6b7280" label={{ value: '주파수 대역 (Hz)', position: 'insideBottom', offset: -5, fill: '#6b7280' }} />
                   {/* YAxis domain을 최대 current 또는 previous 값에 맞게 조정 (예: 0부터 12 또는 데이터 최대값 + 여유) */}
-                  <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" domain={[0, 12]} />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" domain={[0, 12]} label={{ value: '진폭 (mm/s)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#f9fafb',
