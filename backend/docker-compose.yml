@@ -198,7 +198,7 @@ services:
       - "8088:8080" # Spark Master Web UI
       - "7077:7077" # Spark Master internal communication
     volumes:
-      - ./core-site.xml:/opt/spark/conf/core-site.xml
+      - ./backend/core-site.xml:/opt/spark/conf/core-site.xml
     environment:
       SPARK_MODE: master
       SPARK_RPC_AUTHENTICATION_ENABLED: "no"
@@ -226,7 +226,7 @@ services:
       spark-master:
         condition: service_started
     volumes:
-      - ./core-site.xml:/opt/spark/conf/core-site.xml
+      - ./backend/core-site.xml:/opt/spark/conf/core-site.xml
     environment:
       SPARK_MODE: worker
       SPARK_MASTER: spark://spark-master:7077
