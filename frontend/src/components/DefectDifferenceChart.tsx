@@ -1,6 +1,8 @@
+// DefectDifferenceChart.tsx
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import React from 'react'; // React 임포트 추가
 
 export default function DefectDifferenceChart() {
   // 데이터는 3가지 유형(Ball, IR, OR)
@@ -95,7 +97,8 @@ export default function DefectDifferenceChart() {
         </select>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+      {/* 차트와 범례 컨테이너: 가운데 정렬을 위해 justifyContent 추가 */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 36, flexGrow: 1 }}>
         <div style={{ width: 300, height: 400 }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -134,7 +137,7 @@ export default function DefectDifferenceChart() {
           </ResponsiveContainer>
         </div>
         {/* 범례 */}
-        <div style={{ flex: 1 }}>
+        <div style={{ /* flex: 1 속성 제거 */ }}>
           {pieData.map(({ name, value }, idx) => (
             <div key={name} style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
               <span style={{
