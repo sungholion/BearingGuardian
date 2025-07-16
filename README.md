@@ -38,3 +38,4 @@ BearingGuardian/
 - Backend: FastAPI, SQLAlchemy, MySQL
 - Frontend: React
 - ML/DL: (추후 추가 예정)
+- ㅇㅇ
