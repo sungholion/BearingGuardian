@@ -211,7 +211,7 @@ export default function HistoryTable() {
           </div>
 
           <div style={{ display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: '1px solid #ddd' }}>
-            {['전체', '오늘', '일주일', '한달', '일년'].map((period, index) => (
+            {['전체', '오늘', '1주', '1개월', '1년'].map((period, index) => (
               <button
                 key={period}
                 onClick={() => setActivePeriod(period)}
