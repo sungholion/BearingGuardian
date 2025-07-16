@@ -8,6 +8,7 @@ export default function BearingInfo() {
   const [rms, setRms] = useState(2.3); // Initial RMS
   const [peak, setPeak] = useState(7.9); // Initial PEAK
   const [crestFactor, setCrestFactor] = useState(3.2); // Initial CRESTFACTOR
+  const [operatingTimeMs, setOperatingTimeMs] = useState(2847 * 3600 * 1000); // Initial operating time in milliseconds
 
   useEffect(() => {
     const socket = io('http://localhost:5000');
@@ -30,10 +31,30 @@ export default function BearingInfo() {
       console.log('Disconnected from WebSocket');
     });
 
+    // Set up interval for operating time
+    const intervalId = setInterval(() => {
+      setOperatingTimeMs(prevTime => prevTime + 100); // Increment by 100ms every 100ms
+    }, 100);
+
     return () => {
       socket.disconnect();
+      clearInterval(intervalId); // Clean up interval on unmount
     };
   }, []);
+
+  // Helper function to format time
+  const formatOperatingTime = (totalMs) => {
+    const ms = totalMs % 1000;
+    const totalSeconds = Math.floor(totalMs / 1000);
+    const seconds = totalSeconds % 60;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalMinutes / 60);
+
+    const pad = (num) => num.toString().padStart(2, '0');
+
+    return `${hours}:${pad(minutes)}:${pad(seconds)}.${ms.toString().padStart(3, '0')}`;
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300 h-full flex flex-col">
@@ -55,7 +76,7 @@ export default function BearingInfo() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">운영시간:</span>
-              <span className="font-medium">2,847시간</span>
+              <span className="font-medium">{formatOperatingTime(operatingTimeMs)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">하중:</span>
@@ -92,7 +113,7 @@ export default function BearingInfo() {
         <div className="flex-1 flex items-center justify-center max-w-[400px] max-h-[385px]">
           <div className="w-full h-full bg-white rounded-lg border border-gray-300 flex items-center justify-center">
             <img 
-              src="https://readdy.ai/api/search-image?query=industrial%20ball%20bearing%20mechanical%20component%20detailed%20view%20with%20metallic%20surface%20high%20quality%20technical%20engineering%20photo%20clean%20white%20background%20product%20photography%20professional%20lighting&width=300&height=250&seq=bearing-detail&orientation=portrait"
+              src="/moving_bearing.gif"
               alt="베어링 이미지"
               className="w-full h-full object-contain rounded-lg max-w-[300px] max-h-[250px]"
             />
@@ -102,3 +123,4 @@ export default function BearingInfo() {
     </div>
   );
 }
+
