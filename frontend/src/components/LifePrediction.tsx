@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
+import io from 'socket.io-client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
 
 // CustomLabel 컴포넌트 정의
@@ -35,69 +37,106 @@ const CustomLabel = ({ x, y, stroke, value }) => {
   );
 };
 
+
+
 export default function LifePrediction() {
-  const data = [
-    { date: '01/01', actual: 98 },
-    { date: '01/08', actual: 93 },
-    { date: '01/15', actual: 89 },
-    { date: '01/22', actual: 15 }, // <=20, start of first highlight, single point in previous image
-    { date: '01/29', actual: 78 }, // >20, end of first highlight
-    { date: '02/05', actual: 72 },
-    { date: '02/12', actual: 65 },
-    { date: '02/19', actual: 58 },
-    { date: '02/26', actual: 45 },
-    { date: '03/04', actual: 30 },
-    { date: '03/11', actual: 20 }, // <=20, start of second highlight
-    { date: '03/18', actual: 15 },
-    { date: '03/25', actual: 10 },
-    { date: '04/01', actual: 8 },
-    { date: '04/08', actual: 5 },
-    { date: '04/15', actual: 30 }, // >20, end of second highlight
-    { date: '04/22', actual: 40 },
-    { date: '04/29', actual: 18 }, // <=20, start of third highlight
-    { date: '05/06', actual: 12 },
-    { date: '05/13', actual: 105 }, // >20, end of third highlight
-  ];
+  const [data, setData] = useState([
+    { date: 0, actual: 98 },
+  ]);
+  const [bearingStatus, setBearingStatus] = useState('정상'); // Add bearingStatus state
 
   const yAxisMin = 0;
-  const yAxisMax = 120; // YAxis max adjusted to match image
+  const yAxisMax = 100; // YAxis max adjusted to match image
 
-  const highlightSegments = [];
-  let segmentActive = false; // Flag to track if we're currently in a highlight segment
-  let segmentStartIndex = -1;
+  // WebSocket connection for bearingStatus
+  useEffect(() => {
+    const socket = io('http://localhost:5000');
 
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].actual <= 20) {
-      if (!segmentActive) {
-        segmentActive = true;
-        segmentStartIndex = i;
-      }
-    } else {
-      if (segmentActive) {
-        // End of a segment
-        highlightSegments.push({
-          x1: data[segmentStartIndex].date,
-          // If the previous point was the end of highlight, use its date.
-          // For ReferenceArea to work with single points, x2 should be slightly after x1.
-          // A common practice is to use the next point's date if it exists,
-          // or add a small offset to x1 if it's a single point at the end of the chart.
-          // Here, we use the current point's date if it's the point AFTER the highlight.
-          // Or, for a single point, use the current point's date.
-          x2: data[i].date // This creates a highlight from start of segment to start of non-highlighted point
-        });
-        segmentActive = false;
-        segmentStartIndex = -1;
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket for LifePrediction');
+    });
+
+    socket.on('bearing_status_update', (data) => {
+      setBearingStatus(data.status);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket for LifePrediction');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    let timeStep = data.length - 1; // Initialize timeStep based on initial data length
+
+    const interval = setInterval(() => {
+      setData(prevData => {
+        const newData = [...prevData];
+        const lastActual = newData[newData.length - 1].actual;
+        let newActual = lastActual; // Start with current actual value
+
+        // Apply decrease based on bearingStatus
+        if (bearingStatus === '외륜 결함') {
+          newActual -= (Math.random() * 0.5 + 0.5) * 2; // Decrease by 1.0 to 2.5 (approx 2% of 100)
+        } else if (bearingStatus === '내륜 결함') {
+          newActual -= (Math.random() * 0.5 + 0.5) * 3; // Decrease by 1.5 to 3.0 (approx 3% of 100)
+        } else { // Normal or other status
+          newActual -= (Math.random() * 0.1); // Very slow decrease (0 to 0.1)
+        }
+
+        newActual = Math.max(0, newActual); // Ensure it doesn't go below 0
+        newActual = Math.min(100, newActual); // Ensure it doesn't go above 100 (for initial values)
+
+        timeStep++;
+
+        // Remove the oldest data point if array gets too long
+        if (newData.length >= 20) { // Keep around 20 data points
+          newData.shift();
+        }
+
+        newData.push({ date: timeStep, actual: Math.round(newActual) });
+        return newData;
+      });
+    }, 3000); // Update every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [data, bearingStatus]); // Add bearingStatus to dependency array
+
+  // Recalculate highlightSegments whenever data changes
+  const highlightSegments = useMemo(() => {
+    const segments = [];
+    let segmentActive = false;
+    let segmentStartIndex = -1;
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].actual <= 20) {
+        if (!segmentActive) {
+          segmentActive = true;
+          segmentStartIndex = i;
+        }
+      } else {
+        if (segmentActive) {
+          segments.push({
+            x1: data[segmentStartIndex].date,
+            x2: data[i].date
+          });
+          segmentActive = false;
+          segmentStartIndex = -1;
+        }
       }
     }
-  }
 
-  // If a segment is active at the end of the data, add it
-  if (segmentActive) {
-    highlightSegments.push({
-      x1: data[segmentStartIndex].date,
-      x2: data[data.length - 1].date // Highlight until the last date if condition holds
-    });
-  }
+    if (segmentActive) {
+      segments.push({
+        x1: data[segmentStartIndex].date,
+        x2: data[data.length - 1].date
+      });
+    }
+    return segments;
+  }, [data]);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
@@ -109,19 +148,22 @@ export default function LifePrediction() {
           <ResponsiveContainer width="100%" height={"100%"}>
             <LineChart
               data={data}
-              margin={{ top: 15, right: 30, left: -20, bottom: 5 }}
+              margin={{ top: 15, right: 30, left: 20, bottom: 15 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 12 }}
                 stroke="#6b7280"
-                tickMargin={10}
+                tickMargin={1}
+                label={{ value: '운영 시간', position: 'insideBottom', offset: -5, fill: '#6b7280' }}
               />
               <YAxis
                 tick={{ fontSize: 12 }}
                 stroke="#6b7280"
                 domain={[yAxisMin, yAxisMax]}
+                tickCount={11}
+                label={{ value: '잔존 수명 (%)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }}
               />
               <Tooltip
                 contentStyle={{
