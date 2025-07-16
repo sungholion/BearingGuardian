@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kafka Sensor Data</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-time Simulation Input Data</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Bearing n</th>
+                <th>Bearing dP</th>
+                <th>Bearing Race</th>
+                <th>Bearing RPM</th>
+                <th>Bearing dB</th>
+                <th>Bearing Theta</th>
+                <th>Bearing L</th>
+                <th>Bearing N</th>
+                <th>Bearing Lambda</th>
+                <th>Bearing Delta</th>
+                <th>Acquisition Duration</th>
+                <th>Acquisition Frequency</th>
+                <th>Acquisition Noise</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('Socket.IO connected!');
+        });
+
+        socket.on('data', function(msg) {
+            var tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            var newRow = tableBody.insertRow(0); // Insert new row at the top
+
+            var data = msg.data;
+            // console.log("Received msg:", msg); // Keep for debugging if needed
+            // console.log("Extracted data:", data); // Keep for debugging if needed
+
+            var bearingParams = data.bearing_params;
+            var acquisitionParams = data.acquisition_params;
+
+            newRow.insertCell(0).innerHTML = bearingParams.a_n;
+            newRow.insertCell(1).innerHTML = bearingParams.a_dP;
+            newRow.insertCell(2).innerHTML = bearingParams.a_race;
+            newRow.insertCell(3).innerHTML = bearingParams.a_rpm;
+            newRow.insertCell(4).innerHTML = bearingParams.a_dB;
+            newRow.insertCell(5).innerHTML = bearingParams.a_theta;
+            newRow.insertCell(6).innerHTML = bearingParams.a_L;
+            newRow.insertCell(7).innerHTML = bearingParams.a_N;
+            newRow.insertCell(8).innerHTML = bearingParams.a_lambda.join(', ');
+            newRow.insertCell(9).innerHTML = bearingParams.a_delta.join(', ');
+            newRow.insertCell(10).innerHTML = acquisitionParams.a_duration;
+            newRow.insertCell(11).innerHTML = acquisitionParams.a_frequency;
+            newRow.insertCell(12).innerHTML = acquisitionParams.a_noise;
+        });
+    </script>
+</body>
+</html>
