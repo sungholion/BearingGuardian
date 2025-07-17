@@ -16,24 +16,28 @@ export default function DefectDifferenceChart() {
   const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }) => {
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
-    // Adjust this radius based on the new outerRadius to keep labels well inside
-    const radius = outerRadius * 0.7; // Increased this multiplier slightly for larger chart
+    const radius = outerRadius * 0.7; // This controls how far the label is from the center
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    
+    const mainText = `${name}`; 
+    const subText = `(${Math.round(percent * 100)}%)`; 
+
     return (
       <text
         x={x}
         y={y}
-        fill="#fff"
+        fill="#fff" // Label text color
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={14}
+        fontSize={14} // Font size for the main text (name)
         fontWeight="bold"
         style={{ pointerEvents: 'none' }}
       >
-        {name}
-        <tspan x={x} dy="1.2em" fontSize={12} fontWeight="500">
-          ({Math.round(percent * 100)}%)
+        {mainText}
+        <tspan x={x} dy="1.2em" fontSize={15} fontWeight="500"> {/* dy moves the text down */}
+          {subText}
         </tspan>
       </text>
     );
@@ -67,12 +71,12 @@ export default function DefectDifferenceChart() {
         }}>
           불량률 파이 차트
         </span>
-        
+
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 36, flexGrow: 1 }}>
         <div style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
-          <ResponsiveContainer width="100%" height={350}> {/* Increased height from 300 to 350 */}
+          <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -80,7 +84,7 @@ export default function DefectDifferenceChart() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={140} // Increased outerRadius from 90 to 140 for a larger pie
+                outerRadius={140}
                 fill="#8884d8"
                 label={renderLabel}
                 labelLine={false}

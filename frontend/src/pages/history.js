@@ -21,8 +21,7 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded }) {
     }}>
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between', // HISTORY 타이틀과 버튼을 양 끝으로 정렬
-        alignItems: 'center',
+        justifyContent: 'space-between', 
         fontSize: 22,
         fontWeight: 600,
         color: '#333',
@@ -125,19 +124,6 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded }) {
           위험도순
         </button>
         <select style={{
-          marginLeft: 15,
-          height: 36,
-          borderRadius: 8,
-          border: '1px solid #e0e0e0',
-          padding: '0 10px',
-          fontSize: 14,
-          color: '#555',
-          backgroundColor: '#fff',
-          cursor: 'pointer',
-        }}>
-          <option>장비 선택</option>
-        </select>
-        <select style={{
           marginLeft: 10,
           height: 36,
           borderRadius: 8,
@@ -148,7 +134,9 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded }) {
           backgroundColor: '#fff',
           cursor: 'pointer',
         }}>
-          <option>기간 선택</option>
+          <option>전체</option>
+          <option>불량</option>
+          <option>정상</option>
         </select>
       </div>
     </div>
