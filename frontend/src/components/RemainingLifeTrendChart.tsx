@@ -17,7 +17,7 @@ export default function RemainingLifeTrendChart() {
   const chartWidth = 800;
   const yLabelWidth = 60;
   const barStart = yLabelWidth + 5;
-  const barHeight = 18;
+  const barHeight = 18; 
   const gap = 16;
   const chartHeight = data.length * barHeight + (data.length - 1) * gap + 40; // 자동 계산
 

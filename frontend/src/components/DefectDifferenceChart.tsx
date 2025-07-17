@@ -18,7 +18,7 @@ export default function DefectDifferenceChart() {
 
   // 커스텀 라벨
   const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent, index }) => {
-    // 0건이면 라벨 안띄움
+    // 0건이면 라벨 안띄움 
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.68;
