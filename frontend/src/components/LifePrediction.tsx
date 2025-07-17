@@ -44,6 +44,7 @@ export default function LifePrediction() {
     { date: 0, actual: 98 },
   ]);
   const [bearingStatus, setBearingStatus] = useState('정상'); // Add bearingStatus state
+  const [elapsedTime, setElapsedTime] = useState(0); // New state for elapsed time
 
   const yAxisMin = 0;
   const yAxisMax = 100; // YAxis max adjusted to match image
@@ -70,9 +71,9 @@ export default function LifePrediction() {
   }, []);
 
   useEffect(() => {
-    let timeStep = data.length - 1; // Initialize timeStep based on initial data length
-
     const interval = setInterval(() => {
+      setElapsedTime(prevTime => prevTime + 3); // Increment by 3 seconds
+
       setData(prevData => {
         const newData = [...prevData];
         const lastActual = newData[newData.length - 1].actual;
@@ -80,30 +81,28 @@ export default function LifePrediction() {
 
         // Apply decrease based on bearingStatus
         if (bearingStatus === '외륜 결함') {
-          newActual -= (Math.random() * 0.5 + 0.5) * 2; // Decrease by 1.0 to 2.5 (approx 2% of 100)
+          newActual -= 0.6; // Decrease by 0.6% for Outer Race defect
         } else if (bearingStatus === '내륜 결함') {
-          newActual -= (Math.random() * 0.5 + 0.5) * 3; // Decrease by 1.5 to 3.0 (approx 3% of 100)
+          newActual -= 0.1; // Decrease by 0.1% for Inner Race defect
         } else { // Normal or other status
-          newActual -= (Math.random() * 0.1); // Very slow decrease (0 to 0.1)
+          newActual -= (Math.random() * 0.1); // Very slow decrease (0 to 0.1) for Normal
         }
 
         newActual = Math.max(0, newActual); // Ensure it doesn't go below 0
         newActual = Math.min(100, newActual); // Ensure it doesn't go above 100 (for initial values)
-
-        timeStep++;
 
         // Remove the oldest data point if array gets too long
         if (newData.length >= 20) { // Keep around 20 data points
           newData.shift();
         }
 
-        newData.push({ date: timeStep, actual: Math.round(newActual) });
+        newData.push({ date: elapsedTime + 3, actual: Math.round(newActual) }); // Use elapsedTime for date
         return newData;
       });
     }, 3000); // Update every 3 seconds
 
     return () => clearInterval(interval);
-  }, [data, bearingStatus]); // Add bearingStatus to dependency array
+  }, [bearingStatus, elapsedTime]); // Add elapsedTime to dependency array
 
   // Recalculate highlightSegments whenever data changes
   const highlightSegments = useMemo(() => {
@@ -156,20 +155,26 @@ export default function LifePrediction() {
                 tick={{ fontSize: 12 }}
                 stroke="#6b7280"
                 tickMargin={1}
-                label={{ value: '운영 시간', position: 'insideBottom', offset: -5, fill: '#6b7280' }}
+                label={{ value: '운영 시간 (초)', position: 'insideBottom', offset: -5, fill: '#6b7280' }}
               />
               <YAxis
                 tick={{ fontSize: 12 }}
                 stroke="#6b7280"
                 domain={[yAxisMin, yAxisMax]}
                 tickCount={11}
-                label={{ value: '잔존 수명 (%)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }}
+                label={{ value: '잔존 수명 (분)', angle: -90, position: 'insideLeft', offset: 10, fill: '#6b7280' }}
               />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#f9fafb',
                   border: '1px solid #d1d5db',
                   borderRadius: '8px'
+                }}
+                formatter={(value, name, props) => {
+                  if (name === '실제 수명') {
+                    return [`${value}분`, name];
+                  }
+                  return [value, name];
                 }}
               />
               {/* ReferenceArea 컴포넌트를 사용하여 특정 구간을 강조합니다 */}

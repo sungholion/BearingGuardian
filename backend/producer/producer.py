@@ -1,4 +1,3 @@
-import sys
 import time
 import json
 import numpy as np
@@ -7,6 +6,10 @@ from DES.Simulation import Simulation
 from Bearing.Bearing import Bearing
 from DES.Acquisition import Acquisition
 import random
+
+# Global counters for event ratios
+event_counts = {"normal": 0, "outer": 0, "inner": 0}
+total_events = 0
 
 # Define parameter ranges for normal operation
 NORMAL_PARAMS = {
@@ -31,6 +34,11 @@ DEFECT_PARAMS = {
 DEFECT_CHANCE = 0.1 # 10% chance of a defect occurring
 
 def generate_data():
+    a_L = 0.0 # Default to no defect
+    a_N = 0 # Default to no defect
+    a_lambda = [0.0] * 5 # Default to no defect
+    a_delta = [0.0] * 5 # Default to no defect
+
     # Generate normal parameters within their defined ranges
     a_n = random.randint(NORMAL_PARAMS["a_n"][0], NORMAL_PARAMS["a_n"][1])
     a_dP = round(random.uniform(NORMAL_PARAMS["a_dP"][0], NORMAL_PARAMS["a_dP"][1]), 3)
@@ -41,19 +49,39 @@ def generate_data():
     a_frequency = random.randint(NORMAL_PARAMS["a_frequency"][0], NORMAL_PARAMS["a_frequency"][1])
     a_noise = round(random.uniform(NORMAL_PARAMS["a_noise"][0], NORMAL_PARAMS["a_noise"][1]), 2)
 
-    a_race = "outer" # Default to outer, will be randomized if defect occurs
-    a_L = 0.0 # Default to no defect
-    a_N = 0 # Default to no defect
-    a_lambda = [0.0] * 5 # Default to no defect
-    a_delta = [0.0] * 5 # Default to no defect
+    # Determine a_race based on desired probabilities (Normal: 70%, Outer: 20%, Inner: 10%)
+    # This logic ensures the ratio is maintained over every 100 events.
+    global event_counts, total_events
 
-    # Introduce defect occasionally
-    if random.random() < DEFECT_CHANCE:
+    if total_events % 100 == 0:
+        # Reset counts for the new block of 100 events
+        event_counts = {"normal": 0, "outer": 0, "inner": 0}
+
+    # Determine which event to generate based on remaining slots in the current 100-event block
+    remaining_normal = 70 - event_counts["normal"]
+    remaining_outer = 20 - event_counts["outer"]
+    remaining_inner = 10 - event_counts["inner"]
+
+    possible_races = []
+    possible_races.extend(["normal"] * remaining_normal)
+    possible_races.extend(["outer"] * remaining_outer)
+    possible_races.extend(["inner"] * remaining_inner)
+
+    if possible_races:
+        a_race = random.choice(possible_races)
+        event_counts[a_race] += 1
+    else:
+        # Fallback if for some reason no possible races are left (shouldn't happen with correct logic)
+        a_race = random.choice(["normal", "outer", "inner"])
+
+    total_events += 1
+
+    # Introduce defect parameters only if a_race is not "normal"
+    if a_race != "normal":
         a_L = round(random.uniform(DEFECT_PARAMS["a_L"][0], DEFECT_PARAMS["a_L"][1]), 1)
         a_N = random.randint(DEFECT_PARAMS["a_N"][0], DEFECT_PARAMS["a_N"][1])
         a_lambda = [round(random.uniform(DEFECT_PARAMS["a_lambda"][0], DEFECT_PARAMS["a_lambda"][1]), 1) for _ in range(5)]
         a_delta = [round(random.uniform(DEFECT_PARAMS["a_delta"][0], DEFECT_PARAMS["a_delta"][1]), 1) for _ in range(5)]
-        a_race = random.choice(["inner", "outer"]) # Randomly choose inner or outer defect
 
     simulation_input_data = {
         "bearing_params": {
@@ -76,9 +104,6 @@ def generate_data():
     }
     return simulation_input_data
 
-with open('/app/producer_output.log', 'w') as f:
-    f.write("Producer started!\n")
-
 producer = KafkaProducer(
     bootstrap_servers=['kafka:29092'],
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
@@ -88,9 +113,7 @@ try:
     while True:
         data = generate_data()
         producer.send('sound-data', value=data)
-        with open('/app/producer_output.log', 'a') as f:
-            f.write(f"Sent simulation input: {data}\n")
-        time.sleep(1)
+        print(f"Sent simulation input: {data}")
+        time.sleep(3)
 except Exception as e:
-    with open('/app/producer_output.log', 'a') as f:
-        f.write(f"An error occurred: {e}\n")
+    print(f"An error occurred: {e}")

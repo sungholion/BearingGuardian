@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -19,6 +17,28 @@ const CustomLabel = ({ x, y, stroke, value }) => {
 
 
 export default function FrequencyAnalysis() {
+  const [currentTime, setCurrentTime] = useState(null); // Add currentTime state
+
+  // Update current time every second
+  useEffect(() => {
+    setCurrentTime(new Date()); // Set initial time on mount
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Helper function to format date and time
+  const formatDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds} 기준`;
+  };
+
   const initialRealtimeData = [
     { freq: 'S', current: 10, previous: 0.2 },
     { freq: 'M', current: 4.8, previous: 1.5 },
@@ -77,7 +97,7 @@ export default function FrequencyAnalysis() {
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300 h-full flex flex-col">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">실시간 주파수 분석</h2>
-        <span className="text-sm text-gray-500">2025/07/08 15:00 기준</span>
+        <span className="text-sm text-gray-500">{currentTime ? formatDateTime(currentTime) : ''}</span>
       </div>
       <p className="text-sm text-gray-600 mb-6">베어링의 실시간 주파수 변화와 평균 변동을 분석합니다</p>
 

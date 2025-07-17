@@ -11,7 +11,6 @@ export default function StatusChart() {
   const [irCount, setIrCount] = useState(0);
   const [orCount, setOrCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(null); // Set initial state to null
-
   const [pieData, setPieData] = useState([
     { name: 'Normal', value: 73, color: '#10b981' },
     { name: 'IR', value: 22, color: '#ef4444' },
