@@ -13,7 +13,19 @@ export default function DefectDifferenceChart() {
 
   const total = pieData.reduce((sum, entry) => sum + entry.value, 0);
 
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }) => {
+  interface LabelProps {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    innerRadius: number;
+    outerRadius: number;
+    value: number;
+    name: string;
+    percent: number;
+    index?: number; // index는 사용되지 않지만, Recharts에서 제공될 수 있으므로 선택적으로 추가
+  }
+
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }: LabelProps) => {
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
     const radius = outerRadius * 0.7; // This controls how far the label is from the center
