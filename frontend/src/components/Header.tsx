@@ -89,7 +89,7 @@ export default function Header() {
         gap: 50,
       }}>
         {/* 메뉴 3개 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 35 }}>
+        <div style={{ display: 'flex', position: 'relative', right: 100, alignItems: 'center', gap: 35 }}>
           {menus.map((m) => (
             <Link key={m.link} href={m.link} legacyBehavior>
               <a
@@ -123,12 +123,13 @@ export default function Header() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 20, // 아이콘끼리 간격
+          gap: 30, // 아이콘끼리 간격
         }}>
           {/* 알림 아이콘 */}
           <div
             style={{
               position: 'relative',
+              right: 90,
               width: 30,
               height: 30,
               display: 'flex',
@@ -199,6 +200,7 @@ export default function Header() {
           <div
             style={{
               position: 'relative', // Add this line
+              right: 100,
               width: 30,
               height: 30,
               borderRadius: '50%',
@@ -233,13 +235,13 @@ export default function Header() {
                 <h4 style={{ margin: '0 0 10px 0', fontWeight: 'bold', fontSize: '1rem' }}>사용자 정보</h4>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   <li style={{ marginBottom: '5px' }}>
-                    <span style={{ fontWeight: 'bold' }}>담당자:</span> 김성훈
+                    <span style={{ fontWeight: 'bold' }}>담당자:</span> 조성호
                   </li>
                   <li style={{ marginBottom: '5px' }}>
                     <span style={{ fontWeight: 'bold' }}>역할:</span> 관리자
                   </li>
                   <li>
-                    <span style={{ fontWeight: 'bold' }}>이메일:</span> user@example.com
+                    <span style={{ fontWeight: 'bold' }}>이메일:</span> sung@gmail.com
                   </li>
                 </ul>
               </div>

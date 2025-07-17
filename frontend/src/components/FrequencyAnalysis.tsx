@@ -3,6 +3,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area,
 } from 'recharts';
+import SpectrogramHeatmap from './SpectrogramHeatmap';
 
 // 커스텀 레이블 컴포넌트 정의
 const CustomLabel = ({ x, y, stroke, value }) => {
@@ -179,84 +180,8 @@ export default function FrequencyAnalysis() {
           </div>
         </div>
 
-        {/* (2) 주파수 변동(평균) 차트 - 기존 색상 유지 */}
         <div className="flex flex-col flex-1 min-w-0 pr-2 sm:pr-0">
-          <div style={{ minHeight: 66 }}>
-            <h4 className="text-center font-bold text-xl whitespace-nowrap mb-1">
-              주파수 변동(평균) 차트
-            </h4>
-            <div className="flex items-center justify-center mb-2">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-[#4477D8] mr-2"></div>
-                  <span className="text-xs text-gray-600">주파수1</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-[#69C7C5] mr-2"></div>
-                  <span className="text-xs text-gray-600">주파수2</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* 차트 */}
-          <div className="flex-1 border border-gray-300 rounded-lg flex items-center justify-center overflow-x-auto min-w-0 p-0">
-            <div className="w-full min-w-[400px] max-w-[600px] h-[420px] mx-auto">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={variationData}
-                  margin={{ top: 24, right: 24, left: 8, bottom: 16 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="time" tick={{ fontSize: 12 }} stroke="#6b7280" />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    stroke="#6b7280"
-                    domain={[0, 160]}
-                    tickCount={7}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    }}
-                    labelStyle={{ fontWeight: 'bold', color: '#333' }}
-                    itemStyle={{ color: '#555' }}
-                  />
-                  <defs>
-                    <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#4477D8" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#4477D8" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#69C7C5" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#69C7C5" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-
-                  <Area
-                    type="monotone"
-                    dataKey="freq1"
-                    stroke="#4477D8"
-                    strokeWidth={3}
-                    dot={{ fill: '#4477D8', r: 4 }}
-                    fill="url(#colorSales)"
-                    label={<CustomLabel />}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="freq2"
-                    stroke="#69C7C5"
-                    strokeWidth={3}
-                    dot={{ fill: '#69C7C5', r: 4 }}
-                    fill="url(#colorCost)"
-                    label={<CustomLabel />}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <SpectrogramHeatmap />
         </div>
       </div>
     </div>
