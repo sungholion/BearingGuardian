@@ -72,7 +72,7 @@ export default function FrequencyAnalysis() {
           };
         })
       );
-    }, 1000); // Update every 1 second
+    }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
   }, []);
