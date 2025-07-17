@@ -5,9 +5,9 @@ import React from 'react';
 
 export default function DefectDifferenceChart() {
   const pieData = [
-    { name: 'Ball', value: 34 },
-    { name: 'IR', value: 12 },
-    { name: 'OR', value: 8 },
+    { name: 'Normal', value: 340 },
+    { name: 'IR', value: 80 },
+    { name: 'OR', value: 120 },
   ];
   const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF'];
 
@@ -31,12 +31,12 @@ export default function DefectDifferenceChart() {
         fill="#fff" // Label text color
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={14} // Font size for the main text (name)
+        fontSize={18} // Font size for the main text (name)
         fontWeight="bold"
         style={{ pointerEvents: 'none' }}
       >
         {mainText}
-        <tspan x={x} dy="1.2em" fontSize={15} fontWeight="500"> {/* dy moves the text down */}
+        <tspan x={x} dy="1.2em" fontSize={17} fontWeight="500"> {/* dy moves the text down */}
           {subText}
         </tspan>
       </text>
@@ -64,7 +64,7 @@ export default function DefectDifferenceChart() {
         marginBottom: 20,
       }}>
         <span style={{
-          fontSize: 20,
+          fontSize: 26,
           fontWeight: 'bold',
           color: '#222',
           letterSpacing: -1,
@@ -74,7 +74,7 @@ export default function DefectDifferenceChart() {
 
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 36, flexGrow: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 36, flexGrow: 1 }}>
         <div style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
           <ResponsiveContainer width="100%" height={350}>
             <PieChart>
@@ -104,7 +104,7 @@ export default function DefectDifferenceChart() {
                   border: '1px solid #d1d5db',
                   borderRadius: '8px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  fontSize: 13,
+                  fontSize: 18,
                   color: '#444',
                 }}
                 itemStyle={{ color: '#444' }}
@@ -123,8 +123,8 @@ export default function DefectDifferenceChart() {
                 background: COLORS[idx % COLORS.length],
                 marginRight: 10,
               }}></span>
-              <span style={{ fontSize: 15, color: '#222', width: 70 }}>{name}</span>
-              <span style={{ fontWeight: 600, color: '#444', marginLeft: 8 }}>
+              <span style={{ fontSize: 18, color: '#222', width: 70 }}>{name}</span>
+              <span style={{ fontWeight: 600, color: '#444', marginLeft: 8, fontSize: 23 }}>
                 {value}건&nbsp;
                 <span style={{ color: '#aaa' }}>
                   ({total ? Math.round((value / total) * 100) : 0}%)
