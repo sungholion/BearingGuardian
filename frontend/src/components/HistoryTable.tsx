@@ -18,21 +18,87 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
   const datePickerRef = useRef(null);
 
   const [activePeriod, setActivePeriod] = useState('전체');
+  const [hoveredImageInfo, setHoveredImageInfo] = useState(null);
 
-  // New state to store the coordinates relative to the parent container
-  const [hoveredImageInfo, setHoveredImageInfo] = useState<null | { left: number, top: number, imageUrl: string }>(null);
-  const mainContainerRef = useRef<HTMLDivElement>(null); // Ref for the main container
+  interface HistoryItem {
+    id: string;
+    timestamp: string;
+    classificationNumber: string;
+    defectType: string;
+    predictedRUL: string;
+    mediaType: 'audio' | 'image';
+    mediaUrl: string;
+  }
 
-  // 달력 외부 클릭시 닫기
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (datePickerRef.current && !(datePickerRef.current as any).contains(event.target)) {
-        setShowDatePicker(false);
-      }
+  const generateHistoryData = (numItems: number): HistoryItem[] => {
+    const data: HistoryItem[] = [];
+    let currentTimestamp = new Date('2025-07-17T21:00:00');
+    let currentRUL = 75.0;
+
+    const classificationNumbers = ['f_111', 'f_110', 'N_88', 'f_109', 'f_108', 'N_87', 'f_107', 'f_106', 'N_86', 'f_105'];
+    const defectTypes = ['IR', 'OR', 'Normal', 'BALL'];
+    const mediaTypes = ['audio', 'image'];
+    const audioUrls = ['/audio/sample1.mp3', '/audio/sample2.mp3', '/audio/sample3.mp3', '/audio/sample4.mp3', '/audio/sample5.mp3'];
+    const imageUrls = ['/images/sample1.png', '/images/sample2.png', '/images/sample3.png', '/images/sample4.png', '/images/sample5.png'];
+
+    for (let i = 0; i < numItems; i++) {
+      const id = (i + 1).toString();
+      const year = currentTimestamp.getFullYear();
+      const month = (currentTimestamp.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentTimestamp.getDate().toString().padStart(2, '0');
+      const hours = currentTimestamp.getHours().toString().padStart(2, '0');
+      const minutes = currentTimestamp.getMinutes().toString().padStart(2, '0');
+      const seconds = currentTimestamp.getSeconds().toString().padStart(2, '0');
+      const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+      const randomRULChange = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+      currentRUL = Math.max(0, currentRUL + randomRULChange * 0.1); // Ensure RUL doesn't go below 0
+      const predictedRUL = `${currentRUL.toFixed(1)}h`;
+
+      const classificationNumber = classificationNumbers[Math.floor(Math.random() * classificationNumbers.length)];
+      const defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+      const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
+      const mediaUrl = mediaType === 'audio' ? audioUrls[Math.floor(Math.random() * audioUrls.length)] : imageUrls[Math.floor(Math.random() * imageUrls.length)];
+
+      data.push({
+        id,
+        timestamp,
+        classificationNumber,
+        defectType,
+        predictedRUL,
+        mediaType: mediaType as 'audio' | 'image',
+        mediaUrl,
+      });
+
+      currentTimestamp = new Date(currentTimestamp.getTime() + 2 * 1000); // Add 2 seconds
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => { document.removeEventListener("mousedown", handleClickOutside); };
-  }, [datePickerRef]);
+    return data;
+  };
+
+  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    setHistoryData(generateHistoryData(50)); // Generate 50 items for testing
+  }, []);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = historyData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(historyData.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const handlePrevPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
 
   // 날짜 포맷 함수
   const formatDate = (date: Date) => `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}.`;
@@ -137,7 +203,6 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
 
   return (
     <div
-      ref={mainContainerRef} // Assign the ref here
       style={{
         background: '#fff',
         borderRadius: 16,
@@ -163,226 +228,96 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
                 borderBottom: '1px solid #eee',
                 textAlign: 'center',
                 display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
-            }}>재생 및 이미지</th>
+            }}>이미지</th>
           </tr>
         </thead>
         <tbody>
-          {/* 1번째 row (오디오) */}
-          <tr style={{ borderBottom: '1px solid #eee' }}>
-            <td style={{ padding: '12px', textAlign: 'center' }}>2025-07-08 23:58:55</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>f_111</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>IR</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>55h</td>
-            {/* Conditionally hide the column data cell */}
-            <td style={{
+          {currentItems.map(item => (
+            <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
+              <td style={{ padding: '12px', textAlign: 'center' }}>{item.timestamp}</td>
+              <td style={{ padding: '12px', textAlign: 'center' }}>{item.classificationNumber}</td>
+              <td style={{ padding: '12px', textAlign: 'center' }}>Normal</td>
+              <td style={{ padding: '12px', textAlign: 'center' }}>{item.predictedRUL}</td>
+              <td style={{
                 padding: '12px',
                 textAlign: 'center',
-                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
-            }}>
-              {/* 오디오 컨트롤러 */}
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                background: '#f0f0f0',
-                borderRadius: 20,
-                padding: '8px 12px',
-                width: 250,
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
+                display: isPdfExporting ? 'none' : 'table-cell'
               }}>
-                <button style={{
-                  background: 'none', border: 'none', padding: 0,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', marginRight: 8,
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#333' }}>
-                    <path d="M8 6h3v12H8zM13 6h3v12h-3z" />
-                  </svg>
-                </button>
-                <span style={{ fontSize: '0.85rem', color: '#555', whiteSpace: 'nowrap' }}>
-                  0:13 / 2:27
-                </span>
-                <div style={{
-                  flexGrow: 1, height: 4, background: '#ccc', borderRadius: 2,
-                  margin: '0 10px', position: 'relative',
-                }}>
-                  <div style={{
-                    width: '30%', height: '100%', background: '#888', borderRadius: 2,
-                  }}></div>
-                  <div style={{
-                    position: 'absolute', left: 'calc(30% - 6px)', top: -6,
-                    width: 12, height: 12, background: '#555', borderRadius: '50%',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                  }}></div>
+                <div
+                  style={{
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    width: '100%', height: '100px', // Adjust height as needed
+                    overflow: 'hidden',
+                    borderRadius: '8px',
+                    border: '1px solid #eee',
+                    background: '#f9f9f9',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setHoveredImageInfo({
+                      imageUrl: '/images/spectrogram_placeholder.png', // 임의의 스펙트로그램 이미지 경로
+                      left: rect.left + window.scrollX + rect.width / 2,
+                      top: rect.top + window.scrollY - 10, // Adjust as needed
+                    });
+                  }}
+                  onMouseLeave={() => setHoveredImageInfo(null)}
+                >
+                  <img
+                    src="/images/spectrogram_placeholder.png" // 실제 스펙트로그램 이미지 경로
+                    alt="스펙트로그램 이미지"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={e => {
+                      (e.target as HTMLImageElement).onerror = null;
+                      (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/E0E0E0/ADADAD?text=No+Image';
+                    }}
+                  />
                 </div>
-              </div>
-            </td>
-          </tr>
-
-          {/* 2번째 row (이미지 보기) - td 전체 hover시 확대 이미지 */}
-          <tr style={{ borderBottom: '1px solid #eee' }}>
-            <td style={{ padding: '12px', textAlign: 'center' }}>2025-07-08 21:58:55</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>f_110</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>OR</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>35h</td>
-            {/* Conditionally hide the column data cell */}
-            <td
-              style={{
-                padding: '12px',
-                textAlign: 'center',
-                position: 'relative',
-                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
-              }}
-              onMouseEnter={e => {
-                const tdRect = e.currentTarget.getBoundingClientRect();
-                const containerRect = mainContainerRef.current?.getBoundingClientRect();
-
-                if (containerRect) {
-                  // Calculate position relative to the main container
-                  const relativeLeft = tdRect.left - containerRect.left;
-                  const relativeTop = tdRect.top - containerRect.top;
-
-                  // Adjust offsets for desired placement (e.g., above and centered on the td)
-                  const overlayWidth = 300; // Match max-width of the image
-                  const overlayHeight = 200; // Match height of the placeholder image
-                  const offsetX = (tdRect.width - overlayWidth) / 2;
-                  const offsetY = overlayHeight + 10; // 10px buffer below the td
-
-                  setHoveredImageInfo({
-                    left: relativeLeft + offsetX,
-                    top: relativeTop - offsetY, // Position above the td
-                    imageUrl: 'https://placehold.co/300x200/E0E0E0/333333?text=Large+Image'
-                  });
-                }
-              }}
-              onMouseLeave={() => setHoveredImageInfo(null)}
-            >
-              <button
-                style={{
-                  padding: '6px 10px',
-                  borderRadius: 8,
-                  border: '1px solid #ddd',
-                  background: '#f9f9f9',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#555'
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <span style={{ marginLeft: 5 }}>이미지 보기</span>
-              </button>
-            </td>
-          </tr>
-
-          {/* 3번째 row (오디오) */}
-          <tr style={{ borderBottom: '1px solid #eee' }}>
-            <td style={{ padding: '12px', textAlign: 'center' }}>2025-07-08 21:58:55</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>N_88</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>정상</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>100h</td>
-            {/* Conditionally hide the column data cell */}
-            <td style={{
-                padding: '12px',
-                textAlign: 'center',
-                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
-            }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center',
-                background: '#f0f0f0', borderRadius: 20, padding: '8px 12px',
-                width: 250, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
-              }}>
-                <button style={{
-                  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', marginRight: 8,
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#333' }}>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </button>
-                <span style={{ fontSize: '0.85rem', color: '#555', whiteSpace: 'nowrap' }}>
-                  0:13 / 2:27
-                </span>
-                <div style={{
-                  flexGrow: 1, height: 4, background: '#ccc', borderRadius: 2,
-                  margin: '0 10px', position: 'relative',
-                }}>
-                  <div style={{
-                    width: '30%', height: '100%', background: '#888', borderRadius: 2,
-                  }}></div>
-                  <div style={{
-                    position: 'absolute', left: 'calc(30% - 6px)', top: -6,
-                    width: 12, height: 12, background: '#555', borderRadius: '50%',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                  }}></div>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          {/* 4번째 row (오디오) */}
-          <tr style={{ borderBottom: '1px solid #eee' }}>
-            <td style={{ padding: '12px', textAlign: 'center' }}>2025-07-08 21:58:55</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>f_109</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>BALL</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>15h</td>
-            {/* Conditionally hide the column data cell */}
-            <td style={{
-                padding: '12px',
-                textAlign: 'center',
-                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
-            }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center',
-                background: '#f0f0f0', borderRadius: 20, padding: '8px 12px',
-                width: 250, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
-              }}>
-                <button style={{
-                  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', marginRight: 8,
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#333' }}>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </button>
-                <span style={{ fontSize: '0.85rem', color: '#555', whiteSpace: 'nowrap' }}>
-                  0:13 / 2:27
-                </span>
-                <div style={{
-                  flexGrow: 1, height: 4, background: '#ccc', borderRadius: 2,
-                  margin: '0 10px', position: 'relative',
-                }}>
-                  <div style={{
-                    width: '30%', height: '100%', background: '#888', borderRadius: 2,
-                  }}></div>
-                  <div style={{
-                    position: 'absolute', left: 'calc(30% - 6px)', top: -6,
-                    width: 12, height: 12, background: '#555', borderRadius: '50%',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                  }}></div>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
       {/* Conditionally hide the pagination section */}
       <div
         style={{
-          display: isPdfExporting ? 'none' : 'flex', // Hide if PDF exporting
+          display: isPdfExporting ? 'none' : 'flex',
           justifyContent: 'center',
           marginTop: 20,
           gap: 8,
         }}
       >
-        <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>&lt;</button>
-        <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#007bff', color: '#fff', cursor: 'pointer' }}>1</button>
-        <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>2</button>
-        <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>3</button>
-        <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>&gt;</button>
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
+        >
+          &lt;
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+          <button
+            key={pageNumber}
+            onClick={() => paginate(pageNumber)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 8,
+              border: '1px solid #ddd',
+              background: currentPage === pageNumber ? '#007bff' : '#f9f9f9',
+              color: currentPage === pageNumber ? '#fff' : '#333',
+              cursor: 'pointer',
+            }}
+          >
+            {pageNumber}
+          </button>
+        ))}
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
+        >
+          &gt;
+        </button>
       </div>
 
       {/* 이미지 크게 보기 오버레이 */}
