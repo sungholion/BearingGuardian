@@ -1,7 +1,14 @@
-// HistoryTable.tsx (혹은 histroy_table.tsx)
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function HistoryTable() {
+// Define the props interface for HistoryTable
+interface HistoryTableProps {
+  isPdfExporting?: boolean; // Make it optional, as it might not always be passed or needed for all uses
+}
+
+// Update the function signature to accept props
+export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
   // 정렬 기준 상태 관리
   const [activeSort, setActiveSort] = useState('latest');
   // 날짜 관련 상태
@@ -17,6 +24,7 @@ export default function HistoryTable() {
 
   // 이미지 오버레이 상태
   const [hoveredImageInfo, setHoveredImageInfo] = useState<null | { x: number, y: number, imageUrl: string }>(null);
+  const mainContainerRef = useRef<HTMLDivElement>(null); // Add this line
 
   // 달력 외부 클릭시 닫기
   useEffect(() => {
@@ -131,14 +139,16 @@ export default function HistoryTable() {
   };
 
   return (
-    <div style={{
-      background: '#fff',
-      borderRadius: 16,
-      padding: 24,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-      marginBottom: 24,
-      position: 'relative'
-    }}>
+    <div
+      ref={mainContainerRef} // Assign the ref here
+      style={{
+        background: '#fff',
+        borderRadius: 16,
+        padding: 24,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+        marginBottom: 24,
+        position: 'relative' // This is correct for positioning children absolutely
+      }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 24, fontWeight: 'bold', margin: 0 }}>HISTORY</h2>
         <button style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#007bff', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>보고서 다운로드</button>
@@ -288,7 +298,13 @@ export default function HistoryTable() {
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>분류 번호</th>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>불량 유형</th>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>예측 잔여 수명</th>
-            <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>재생 및 이미지</th>
+            {/* Conditionally hide the column header */}
+            <th style={{
+                padding: '12px',
+                borderBottom: '1px solid #eee',
+                textAlign: 'center',
+                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
+            }}>재생 및 이미지</th>
           </tr>
         </thead>
         <tbody>
@@ -298,7 +314,12 @@ export default function HistoryTable() {
             <td style={{ padding: '12px', textAlign: 'center' }}>f_111</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>IR</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>55h</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>
+            {/* Conditionally hide the column data cell */}
+            <td style={{
+                padding: '12px',
+                textAlign: 'center',
+                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
+            }}>
               {/* 오디오 컨트롤러 */}
               <div style={{
                 display: 'inline-flex',
@@ -343,15 +364,35 @@ export default function HistoryTable() {
             <td style={{ padding: '12px', textAlign: 'center' }}>f_110</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>OR</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>35h</td>
+            {/* Conditionally hide the column data cell */}
             <td
-              style={{ padding: '12px', textAlign: 'center', position: 'relative' }}
+              style={{
+                padding: '12px',
+                textAlign: 'center',
+                position: 'relative',
+                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
+              }}
               onMouseEnter={e => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                setHoveredImageInfo({
-                  x: rect.left + window.scrollX,
-                  y: rect.top + window.scrollY,
-                  imageUrl: 'https://placehold.co/300x200/E0E0E0/333333?text=Large+Image'
-                });
+                const tdRect = e.currentTarget.getBoundingClientRect();
+                const containerRect = mainContainerRef.current?.getBoundingClientRect();
+
+                if (containerRect) {
+                  // Calculate position relative to the main container
+                  const relativeLeft = tdRect.left - containerRect.left;
+                  const relativeTop = tdRect.top - containerRect.top;
+
+                  // Adjust offsets for desired placement (e.g., above and centered on the td)
+                  const overlayWidth = 300; // Match max-width of the image
+                  const overlayHeight = 200; // Match height of the placeholder image
+                  const offsetX = (tdRect.width - overlayWidth) / 2;
+                  const offsetY = overlayHeight + 10; // 10px buffer below the td
+
+                  setHoveredImageInfo({
+                    left: relativeLeft + offsetX,
+                    top: relativeTop - offsetY, // Position above the td
+                    imageUrl: 'https://placehold.co/300x200/E0E0E0/333333?text=Large+Image'
+                  });
+                }
               }}
               onMouseLeave={() => setHoveredImageInfo(null)}
             >
@@ -383,7 +424,12 @@ export default function HistoryTable() {
             <td style={{ padding: '12px', textAlign: 'center' }}>N_88</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>정상</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>100h</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>
+            {/* Conditionally hide the column data cell */}
+            <td style={{
+                padding: '12px',
+                textAlign: 'center',
+                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
+            }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center',
                 background: '#f0f0f0', borderRadius: 20, padding: '8px 12px',
@@ -423,7 +469,12 @@ export default function HistoryTable() {
             <td style={{ padding: '12px', textAlign: 'center' }}>f_109</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>BALL</td>
             <td style={{ padding: '12px', textAlign: 'center' }}>15h</td>
-            <td style={{ padding: '12px', textAlign: 'center' }}>
+            {/* Conditionally hide the column data cell */}
+            <td style={{
+                padding: '12px',
+                textAlign: 'center',
+                display: isPdfExporting ? 'none' : 'table-cell' // Hide if PDF exporting
+            }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center',
                 background: '#f0f0f0', borderRadius: 20, padding: '8px 12px',
@@ -459,7 +510,15 @@ export default function HistoryTable() {
         </tbody>
       </table>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, gap: 8 }}>
+      {/* Conditionally hide the pagination section */}
+      <div
+        style={{
+          display: isPdfExporting ? 'none' : 'flex', // Hide if PDF exporting
+          justifyContent: 'center',
+          marginTop: 20,
+          gap: 8,
+        }}
+      >
         <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>&lt;</button>
         <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#007bff', color: '#fff', cursor: 'pointer' }}>1</button>
         <button style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}>2</button>

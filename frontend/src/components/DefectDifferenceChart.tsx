@@ -1,43 +1,43 @@
-// DefectDifferenceChart.tsx
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import React from 'react'; // React 임포트 추가
+import React from 'react';
 
 export default function DefectDifferenceChart() {
-  // 데이터는 3가지 유형(Ball, IR, OR)
   const pieData = [
     { name: 'Ball', value: 34 },
     { name: 'IR', value: 12 },
     { name: 'OR', value: 8 },
   ];
-  // 파란색/보라색 계열
-  const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF']; // 원하는 계열로 더 세분화 가능
+  const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF'];
 
   const total = pieData.reduce((sum, entry) => sum + entry.value, 0);
 
-  // 커스텀 라벨
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent, index }) => {
-    // 0건이면 라벨 안띄움
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }) => {
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.68;
+    const radius = outerRadius * 0.7; // This controls how far the label is from the center
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    
+    const mainText = `${name}`; 
+    const subText = `(${Math.round(percent * 100)}%)`; 
+
     return (
       <text
         x={x}
         y={y}
-        fill="#fff"
+        fill="#fff" // Label text color
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={14}
+        fontSize={14} // Font size for the main text (name)
         fontWeight="bold"
         style={{ pointerEvents: 'none' }}
       >
-        {name}
-        <tspan x={x} dy="1.2em" fontSize={12} fontWeight="500">
-          ({Math.round(percent * 100)}%)
+        {mainText}
+        <tspan x={x} dy="1.2em" fontSize={15} fontWeight="500"> {/* dy moves the text down */}
+          {subText}
         </tspan>
       </text>
     );
@@ -56,7 +56,6 @@ export default function DefectDifferenceChart() {
         height: '100%',
       }}
     >
-      {/* 타이틀+셀렉트 */}
       <div style={{
         width: '100%',
         display: 'flex',
@@ -72,35 +71,12 @@ export default function DefectDifferenceChart() {
         }}>
           불량률 파이 차트
         </span>
-        <select
-          style={{
-            padding: '6px 10px',
-            borderRadius: 8,
-            border: '1px solid #ddd',
-            fontSize: 15,
-            background: '#fff',
-            color: '#222',
-            minWidth: 120,
-            height: 38,
-            fontWeight: 500,
-            boxShadow: 'none',
-            outline: 'none',
-            appearance: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          <option>기간 선택 ▼</option>
-          <option>오늘</option>
-          <option>1주</option>
-          <option>1개월</option>
-          <option>1년</option>
-        </select>
+
       </div>
 
-      {/* 차트와 범례 컨테이너: 가운데 정렬을 위해 justifyContent 추가 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 36, flexGrow: 1 }}>
-        <div style={{ width: 300, height: 400 }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
+          <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -108,7 +84,7 @@ export default function DefectDifferenceChart() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={150}      // innerRadius 없이 파이!
+                outerRadius={140}
                 fill="#8884d8"
                 label={renderLabel}
                 labelLine={false}
@@ -136,7 +112,6 @@ export default function DefectDifferenceChart() {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        {/* 범례 */}
         <div style={{ /* flex: 1 속성 제거 */ }}>
           {pieData.map(({ name, value }, idx) => (
             <div key={name} style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>

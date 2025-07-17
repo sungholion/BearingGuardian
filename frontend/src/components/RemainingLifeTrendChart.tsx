@@ -17,9 +17,9 @@ export default function RemainingLifeTrendChart() {
   const chartWidth = 800;
   const yLabelWidth = 60;
   const barStart = yLabelWidth + 5;
-  const barHeight = 18;
+  const barHeight = 28; // Increased from 18 to 28 for thicker bars
   const gap = 16;
-  const chartHeight = data.length * barHeight + (data.length - 1) * gap + 40; // 자동 계산
+  const chartHeight = data.length * barHeight + (data.length - 1) * gap + 40; // Auto-calculated height
 
   return (
     <div
@@ -49,29 +49,6 @@ export default function RemainingLifeTrendChart() {
         }}>
           잔여 수명 추이 차트
         </span>
-        <select
-          style={{
-            padding: '6px 10px',
-            borderRadius: 8,
-            border: '1px solid #ddd',
-            fontSize: 15,
-            background: '#fff',
-            color: '#222',
-            minWidth: 120,
-            height: 38,
-            fontWeight: 500,
-            boxShadow: 'none',
-            outline: 'none',
-            appearance: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          <option>기간 선택 ▼</option>
-          <option>오늘</option>
-          <option>1주</option>
-          <option>1개월</option>
-          <option>1년</option>
-        </select>
       </div>
       <svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth + yLabelWidth + 10} ${chartHeight}`}>
         {[0, 20, 40, 60, 80, 100].map((x) => {

@@ -9,7 +9,7 @@ import DefectDifferenceChart from '../components/DefectDifferenceChart';
 
 export default function HistoryPage() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f2f2f2' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header />
         {/* 상단: 테이블 카드 */}
