@@ -12,7 +12,7 @@ export default function EnvironmentSensor() {
     setCurrentTime(new Date());
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000);
+    }, 2000);
     return () => clearInterval(timer);
   }, []);
 
@@ -40,7 +40,7 @@ export default function EnvironmentSensor() {
         setHumidityDirection(newHumidity > prevHumidity ? 1 : (newHumidity < prevHumidity ? -1 : 0));
         return newHumidity;
       });
-    }, 4000); // Update every 4 seconds
+    }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
   }, []);

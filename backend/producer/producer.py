@@ -114,6 +114,6 @@ try:
         data = generate_data()
         producer.send('sound-data', value=data)
         print(f"Sent simulation input: {data}")
-        time.sleep(3)
+        time.sleep(2)
 except Exception as e:
     print(f"An error occurred: {e}")
