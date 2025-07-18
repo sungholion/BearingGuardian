@@ -1,25 +1,27 @@
-import React from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts';
 
 export default function RemainingLifeTrendChart() {
+  // 정적인 누적 잔여 수명 데이터 (예시)
   const data = [
-    { label: '베어링 1', value: 85 },
-    { label: '베어링 2', value: 60 },
-    { label: '베어링 3', value: 75 },
-    { label: '베어링 4', value: 90 },
-    { label: '베어링 5', value: 40 },
-    { label: '베어링 6', value: 55 },
-    { label: '베어링 7', value: 68 },
-    { label: '베어링 8', value: 32 },
-    { label: '베어링 9', value: 79 },
-    { label: '베어링 10', value: 23 },
+    { date: '2025-07-01', '잔여 사이클 수': 95.0 },
+    { date: '2025-07-02', '잔여 사이클 수': 94.9 },
+    { date: '2025-07-03', '잔여 사이클 수': 94.9 },
+    { date: '2025-07-04', '잔여 사이클 수': 94.8 },
+    { date: '2025-07-05', '잔여 사이클 수': 94.8 },
+    { date: '2025-07-06', '잔여 사이클 수': 94.7 },
+    { date: '2025-07-07', '잔여 사이클 수': 94.7 },
+    { date: '2025-07-08', '잔여 사이클 수': 94.6 },
+    { date: '2025-07-09', '잔여 사이클 수': 94.6 },
+    { date: '2025-07-10', '잔여 사이클 수': 72.2 }, // IR 발생으로 급감
+    { date: '2025-07-11', '잔여 사이클 수': 72.1 },
+    { date: '2025-07-12', '잔여 사이클 수': 72.0 },
+    { date: '2025-07-13', '잔여 사이클 수': 71.9 },
+    { date: '2025-07-14', '잔여 사이클 수': 71.8 },
+    { date: '2025-07-15', '잔여 사이클 수': 71.7 },
+    { date: '2025-07-16', '잔여 사이클 수': 71.6 },
+    { date: '2025-07-17', '잔여 사이클 수': 71.5 },
+    { date: '2025-07-18', '잔여 사이클 수': 71.4 },
   ];
-
-  const chartWidth = 800;
-  const yLabelWidth = 60;
-  const barStart = yLabelWidth + 5;
-  const barHeight = 28; // Increased from 18 to 28 for thicker bars
-  const gap = 16;
-  const chartHeight = data.length * barHeight + (data.length - 1) * gap + 40; // Auto-calculated height
 
   return (
     <div
@@ -47,83 +49,24 @@ export default function RemainingLifeTrendChart() {
           color: '#222',
           letterSpacing: -1,
         }}>
-          잔여 수명 추이 차트
+          누적 잔여 사이클 수 추이
         </span>
       </div>
-      <svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth + yLabelWidth + 10} ${chartHeight}`}>
-        {[0, 20, 40, 60, 80, 100].map((x) => {
-          const xpos = barStart + (x / 100) * chartWidth;
-          return (
-            <g key={x}>
-              <line
-                x1={xpos}
-                y1={0}
-                x2={xpos}
-                y2={chartHeight - 30}
-                stroke="#e0e0e0"
-                strokeDasharray="2 2"
-              />
-              <text
-                x={xpos}
-                y={chartHeight - 10}
-                textAnchor="middle"
-                fontSize="12"
-                fill="#aaa"
-              >
-                {x}
-              </text>
-            </g>
-          );
-        })}
-        {data.map((item, idx) => {
-          const y = idx * (barHeight + gap) + 4;
-          const barLen = (item.value / 100) * chartWidth;
-          return (
-            <g key={item.label}>
-              <text
-                x={yLabelWidth - 5}
-                y={y + barHeight / 2}
-                textAnchor="end"
-                fontSize="13"
-                fill="#333"
-                alignmentBaseline="middle"
-                fontWeight={500}
-              >
-                {item.label}
-              </text>
-              <rect
-                x={barStart}
-                y={y}
-                width={barLen}
-                height={barHeight}
-                fill="#42a5f5"
-                rx={4}
-                ry={4}
-              />
-              <text
-                x={barStart + barLen - 8}
-                y={y + barHeight / 2}
-                textAnchor="end"
-                fontSize="12"
-                fill="#fff"
-                fontWeight="bold"
-                alignmentBaseline="middle"
-                style={{ pointerEvents: 'none', textShadow: '0 0 2px #1976d2' }}
-              >
-                {item.value}%
-              </text>
-            </g>
-          );
-        })}
-        <line
-          x1={barStart}
-          y1={chartHeight - 30}
-          x2={barStart + chartWidth}
-          y2={chartHeight - 30}
-          stroke="#bbb"
-          strokeWidth={1.2}
-        />
-      </svg>
+      <ResponsiveContainer width="100%" height="90%">
+        <AreaChart
+          data={data}
+          margin={{
+            top: 10, right: 30, left: 0, bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis type="number" domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} />
+          <Tooltip />
+          <Area type="monotone" dataKey="잔여 사이클 수" stroke="#8884d8" fill="#8884d8" />
+          <ReferenceDot x="2025-07-10" y={data.find(d => d.date === '2025-07-10')['잔여 사이클 수']} r={5} fill="red" stroke="none" label={{ value: 'IR 발생', position: 'top', fill: 'red' }} />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   );
 }
