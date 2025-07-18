@@ -8,7 +8,7 @@ interface HistoryTableProps {
 }
 
 // Update the function signature to accept props
-export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
+export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTableProps & { defectFilter: string }) {
   const [activeSort, setActiveSort] = useState('latest');
   const [selectedStartDate, setSelectedStartDate] = useState(new Date(2020, 4, 1));
   const [selectedEndDate, setSelectedEndDate] = useState(new Date(2020, 5, 26));
@@ -17,8 +17,9 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef(null);
 
-  const [activePeriod, setActivePeriod] = useState('전체');
   const [hoveredImageInfo, setHoveredImageInfo] = useState(null);
+  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+  const [filteredHistoryData, setFilteredHistoryData] = useState<HistoryItem[]>([]);
 
   interface HistoryItem {
     id: string;
@@ -35,8 +36,7 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
     let currentTimestamp = new Date('2025-07-17T21:00:00');
     let currentRUL = 75.0;
 
-    const classificationNumbers = ['f_111', 'f_110', 'N_88', 'f_109', 'f_108', 'N_87', 'f_107', 'f_106', 'N_86', 'f_105'];
-    const defectTypes = ['IR', 'OR', 'Normal', 'BALL'];
+    const defectTypes = ['IR', 'OR', 'Normal'];
     const mediaTypes = ['audio', 'image'];
     const audioUrls = ['/audio/sample1.mp3', '/audio/sample2.mp3', '/audio/sample3.mp3', '/audio/sample4.mp3', '/audio/sample5.mp3'];
     const imageUrls = ['/images/sample1.png', '/images/sample2.png', '/images/sample3.png', '/images/sample4.png', '/images/sample5.png'];
@@ -53,10 +53,18 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
 
       const randomRULChange = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
       currentRUL = Math.max(0, currentRUL + randomRULChange * 0.1); // Ensure RUL doesn't go below 0
-      const predictedRUL = `${currentRUL.toFixed(1)}h`;
+      const predictedRUL = `${currentRUL.toFixed(1)} 일`;
 
-      const classificationNumber = classificationNumbers[Math.floor(Math.random() * classificationNumbers.length)];
       const defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+      let classificationNumber: string;
+      if (defectType === 'OR') {
+        classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (defectType === 'IR') {
+        classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else { // Normal
+        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      }
+      
       const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
       const mediaUrl = mediaType === 'audio' ? audioUrls[Math.floor(Math.random() * audioUrls.length)] : imageUrls[Math.floor(Math.random() * imageUrls.length)];
 
@@ -75,20 +83,34 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
     return data;
   };
 
-  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+  useEffect(() => {
+    const generatedData = generateHistoryData(50);
+    const sortedData = generatedData.sort((a, b) => {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    });
+    setHistoryData(sortedData);
+    setFilteredHistoryData(sortedData); // Initialize filtered data with all data
+  }, []);
 
   useEffect(() => {
-    setHistoryData(generateHistoryData(50)); // Generate 50 items for testing
-  }, []);
+    let dataToFilter = historyData;
+    if (defectFilter === '정상') {
+      dataToFilter = historyData.filter(item => item.defectType === 'Normal');
+    } else if (defectFilter === '불량') {
+      dataToFilter = historyData.filter(item => item.defectType === 'IR' || item.defectType === 'OR');
+    }
+    setFilteredHistoryData(dataToFilter);
+    setCurrentPage(1); // Reset to first page on filter change
+  }, [defectFilter, historyData]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = historyData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredHistoryData.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(historyData.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredHistoryData.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -236,7 +258,7 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
             <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.timestamp}</td>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.classificationNumber}</td>
-              <td style={{ padding: '12px', textAlign: 'center' }}>Normal</td>
+              <td style={{ padding: '12px', textAlign: 'center' }}>{item.defectType}</td>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.predictedRUL}</td>
               <td style={{
                 padding: '12px',
@@ -256,15 +278,15 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
                   onMouseEnter={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     setHoveredImageInfo({
-                      imageUrl: '/images/spectrogram_placeholder.png', // 임의의 스펙트로그램 이미지 경로
-                      left: rect.left + window.scrollX + rect.width / 2,
-                      top: rect.top + window.scrollY - 10, // Adjust as needed
+                      imageUrl: '/zupa.png', // 임의의 스펙트로그램 이미지 경로
+                      left: e.clientX - 550, // 커서 X 위치에서 이미지 너비의 절반만큼 왼쪽으로 이동 (수평 중앙 정렬)
+                      top: e.clientY - 350, // 커서 Y 위치에서 이미지 높이 + 여백만큼 위로 이동
                     });
                   }}
                   onMouseLeave={() => setHoveredImageInfo(null)}
                 >
                   <img
-                    src="/images/spectrogram_placeholder.png" // 실제 스펙트로그램 이미지 경로
+                    src="/zupa.png" // 실제 스펙트로그램 이미지 경로
                     alt="스펙트로그램 이미지"
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     onError={e => {
@@ -336,7 +358,7 @@ export default function HistoryTable({ isPdfExporting }: HistoryTableProps) {
           <img
             src={hoveredImageInfo.imageUrl}
             alt="확대 이미지"
-            style={{ display: 'block', maxWidth: '300px', height: 'auto' }}
+            style={{ display: 'block', maxWidth: '500px', height: 'auto' }}
             onError={e => {
               (e.target as HTMLImageElement).onerror = null;
               (e.target as HTMLImageElement).src = 'https://placehold.co/300x200/FF0000/FFFFFF?text=Image+Load+Error';
