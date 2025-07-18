@@ -5,23 +5,28 @@ import React from 'react';
 
 export default function DefectDifferenceChart() {
   const pieData = [
-    { name: 'Normal', value: 340 },
-    { name: 'IR', value: 80 },
-    { name: 'OR', value: 120 },
+    { name: 'Normal', value: 21090},
+    { name: 'IR', value:  	13478},
+    { name: 'OR', value: 8632},
   ];
   const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF'];
 
   const total = pieData.reduce((sum, entry) => sum + entry.value, 0);
 
+  // 숫자를 천 단위 구분 기호로 포맷팅하는 헬퍼 함수
+  const formatNumber = (num) => {
+    return num.toLocaleString();
+  };
+
   const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }) => {
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 0.7; // This controls how far the label is from the center
+    const radius = outerRadius * 0.58; // This controls how far the label is from the center
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     
-    const mainText = `${name}`; 
+    const mainText = `${name} ${formatNumber(value)}건`; 
     const subText = `(${Math.round(percent * 100)}%)`; 
 
     return (
@@ -31,7 +36,7 @@ export default function DefectDifferenceChart() {
         fill="#fff" // Label text color
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={18} // Font size for the main text (name)
+        fontSize={17} // Font size for the main text (name)
         fontWeight="bold"
         style={{ pointerEvents: 'none' }}
       >
@@ -97,7 +102,7 @@ export default function DefectDifferenceChart() {
               <Tooltip
                 formatter={(value, name, props) => {
                   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                  return [`${value}건 (${percentage}%)`, name];
+                  return [`${formatNumber(value)}건 (${percentage}%)`, name];
                 }}
                 contentStyle={{
                   backgroundColor: '#fff',
@@ -125,7 +130,7 @@ export default function DefectDifferenceChart() {
               }}></span>
               <span style={{ fontSize: 18, color: '#222', width: 70 }}>{name}</span>
               <span style={{ fontWeight: 600, color: '#444', marginLeft: 8, fontSize: 23 }}>
-                {value}건&nbsp;
+                {formatNumber(value)}건&nbsp;
                 <span style={{ color: '#aaa' }}>
                   ({total ? Math.round((value / total) * 100) : 0}%)
                 </span>
