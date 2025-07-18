@@ -1,0 +1,4 @@
+feat: Adjust RUL decrease logic in HistoryTable and RemainingLifeTrendChart
+
+HistoryTable의 예측 잔여 수명이 가장 최근 데이터에서 가장 낮은 수치로 시작하여 과거로 갈수록 증가하도록 변경합니다.
+95.0에서 시작하여 각 단계마다 0.1씩 감소하거나 유지되도록 랜덤한 변화를 적용합니다.
