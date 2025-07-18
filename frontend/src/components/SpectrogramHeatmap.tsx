@@ -187,7 +187,8 @@ export default function Component() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-4xl mx-auto p-6" style={{
+      marginTop: '50px' }}>
       <Card>
         <CardHeader>
           <CardTitle>주파수-시간 히트맵 (Spectrogram)</CardTitle>

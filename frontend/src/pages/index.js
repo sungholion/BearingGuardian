@@ -100,7 +100,7 @@ export default function Home() {
               {/* RUL 예측 (개선된 버전) */}
               <Card className="col-span-6 rounded-lg border bg-card text-card-foreground shadow-sm">
                 <CardHeader className="flex flex-col space-y-1.5 p-6">
-                  <CardTitle className="text-lg font-semibold leading-none tracking-tight">예측 수명 분석</CardTitle>
+                  <CardTitle className="text-2xl font-bold">예측 수명 분석</CardTitle>
                   <div className="text-sm text-gray-500">잔존의 예측 수명을 분석합니다</div>
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
