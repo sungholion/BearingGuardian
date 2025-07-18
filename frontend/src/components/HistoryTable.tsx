@@ -33,8 +33,8 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
 
   const generateHistoryData = (numItems: number): HistoryItem[] => {
     const data: HistoryItem[] = [];
-    let currentTimestamp = new Date('2025-07-17T21:00:00');
-    let currentRUL = 75.0;
+    let currentTimestamp = new Date('2025-07-18T13:00:00');
+    let currentRUL = 95.0; // 95에서 시작
 
     const defectTypes = ['IR', 'OR', 'Normal'];
     const mediaTypes = ['audio', 'image'];
@@ -51,20 +51,39 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
       const seconds = currentTimestamp.getSeconds().toString().padStart(2, '0');
       const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-      const randomRULChange = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
-      currentRUL = Math.max(0, currentRUL + randomRULChange * 0.1); // Ensure RUL doesn't go below 0
-      const predictedRUL = `${currentRUL.toFixed(1)} 일`;
+      // predictedRUL은 95에서 시작하여 0.1씩 감소하거나 유지되거나 하는 랜덤한 변화
+      // 가장 최근 데이터가 가장 낮은 수치여야 하므로, i가 증가할수록 RUL이 감소하도록 조정
+      const predictedRULValue = 95.0 - (i * 0.1); // 95에서 시작하여 0.1씩 감소
+      const predictedRUL = `${predictedRULValue.toFixed(1)}`;
 
-      const defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+      let defectType: string;
       let classificationNumber: string;
-      if (defectType === 'OR') {
-        classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else if (defectType === 'IR') {
-        classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else { // Normal
+
+      // 첫 번째 페이지 항목 (0, 1, 2, 3 인덱스)에 대한 강제 설정
+      if (i === 0) {
+        defectType = 'Normal';
         classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (i === 1) {
+        defectType = 'Normal';
+        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (i === 2) {
+        defectType = 'IR';
+        classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (i === 3) {
+        defectType = 'Normal';
+        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else {
+        // 나머지 항목은 기존 로직 유지 (랜덤)
+        defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+        if (defectType === 'OR') {
+          classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+        } else if (defectType === 'IR') {
+          classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+        } else { // Normal
+          classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+        }
       }
-      
+
       const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
       const mediaUrl = mediaType === 'audio' ? audioUrls[Math.floor(Math.random() * audioUrls.length)] : imageUrls[Math.floor(Math.random() * imageUrls.length)];
 
@@ -78,7 +97,8 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
         mediaUrl,
       });
 
-      currentTimestamp = new Date(currentTimestamp.getTime() + 2 * 1000); // Add 2 seconds
+      // 시간을 역순으로 감소 (예: 2초씩 감소)
+      currentTimestamp = new Date(currentTimestamp.getTime() - 2 * 1000); // 2초씩 감소
     }
     return data;
   };
