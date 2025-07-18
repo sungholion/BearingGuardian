@@ -21,23 +21,20 @@ const menus = [
   { name: "Settings", link: "/settings" },
 ];
 
-export default function Header() {
-  const router = useRouter(); // useRouter 훅을 초기화합니다.
-  const activePath = router.pathname; // 현재 페이지의 경로를 가져와 activePath에 할당합니다.
+export default function Header({ notifications, setNotifications }) {
+  const router = useRouter();
+  const activePath = router.pathname;
 
   const [showNotificationTooltip, setShowNotificationTooltip] = useState(false);
   const [showUserTooltip, setShowUserTooltip] = useState(false);
 
-  // Mock notification data
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: '베어링 A에 새로운 결함 감지', timestamp: '2025-07-17 10:30:00' },
-    { id: 2, message: '베어링 B 정기 점검 예정', timestamp: '2025-07-16 14:00:00' },
-    { id: 3, message: '시스템 업데이트 완료', timestamp: '2025-07-15 09:00:00' },
-    { id: 4, message: '베어링 C 온도 이상 감지', timestamp: '2025-07-17 11:00:00' },
-    { id: 5, message: '베어링 D 진동 패턴 변화', timestamp: '2025-07-17 11:15:00' },
-    { id: 6, message: '베어링 E 수명 예측 경고', timestamp: '2025-07-17 11:30:00' },
-    { id: 7, message: '베어링 F 소음 레벨 증가', timestamp: '2025-07-17 11:45:00' },
-  ]);
+  // 베어링 페이지 목록
+  const bearingPages = [
+    { name: '베어링 1', link: '/' },
+    { name: '베어링 2', link: '/bearing2' },
+    { name: '베어링 3', link: '/bearing3' },
+    { name: '베어링 4', link: '/bearing4' },
+  ];
 
   return (
     <div
@@ -82,6 +79,38 @@ export default function Header() {
           </span>
         </div>
       </Link>
+
+      {/* 베어링 선택 버튼 그룹 */}
+      <div style={{ display: 'flex', gap: 15, position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+        {bearingPages.map((b) => (
+          <Link key={b.link} href={b.link} legacyBehavior>
+            <a
+              style={{
+                fontSize: "1.2rem",
+                color: b.link === activePath ? "#1646d9" : "#727171ff",
+                fontWeight: b.link === activePath ? 700 : 500,
+                textDecoration: "none",
+                padding: "7px 14px",
+                borderRadius: "8px",
+                background: "none",
+                transition: "background .15s, color .15s, font-weight .15s",
+                cursor: "pointer",
+                border: b.link === activePath ? "1px solid #1646d9" : "1px solid transparent",
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = "#f1f5fb";
+                e.currentTarget.style.color = "#1a3184";
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = "none";
+                e.currentTarget.style.color = b.link === activePath ? "#1646d9" : "#727171ff";
+              }}
+            >
+              {b.name}
+            </a>
+          </Link>
+        ))}
+      </div>
       {/* 우측: 메뉴 → 알림 → 회원 아이콘 */}
       <div style={{
         display: 'flex',
@@ -140,7 +169,7 @@ export default function Header() {
             onClick={() => setShowNotificationTooltip(prev => !prev)}
           >
             <BellIcon />
-            {notifications.length > 0 && (
+            {notifications?.length > 0 && (
               <span style={{
                 position: 'absolute',
                 top: -7,
@@ -181,7 +210,7 @@ export default function Header() {
                 border: '1px solid #ddd',
               }}>
                 <h4 style={{ margin: '0 0 10px 0', fontWeight: 'bold', fontSize: '1rem' }}>알림</h4>
-                {notifications.length > 0 ? (
+                {(notifications && notifications.length > 0) ? (
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {notifications.map(notif => (
                       <li key={notif.id} style={{ marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>

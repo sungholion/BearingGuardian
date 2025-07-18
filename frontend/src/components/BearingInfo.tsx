@@ -1,12 +1,42 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-export default function BearingInfo() {
+export default function BearingInfo({ bearingId }) {
   const [rpm, setRpm] = useState(1760); // Initial RPM
   const [rms, setRms] = useState(2.3); // Initial RMS
   const [peak, setPeak] = useState(7.9); // Initial PEAK
   const [crestFactor, setCrestFactor] = useState(3.2); // Initial CRESTFACTOR
-  const [operatingTimeMs, setOperatingTimeMs] = useState(2847 * 3600 * 1000); // Initial operating time in milliseconds
+
+  const bearingData = {
+    bearing1: {
+      model: 'SKF 6205-2RS',
+      installationDate: '2024.01.15',
+      load: '850 N',
+      initialOperatingTimeMs: 2847 * 3600 * 1000, // 베어링 1의 초기 운영 시간
+    },
+    bearing2: {
+      model: 'FAG 6308',
+      installationDate: '2023.11.01',
+      load: '1200 N',
+      initialOperatingTimeMs: 3500 * 3600 * 1000, // 베어링 2의 초기 운영 시간
+    },
+    bearing3: {
+      model: 'NTN 6006LLU',
+      installationDate: '2024.03.20',
+      load: '700 N',
+      initialOperatingTimeMs: 1500 * 3600 * 1000, // 베어링 3의 초기 운영 시간
+    },
+    bearing4: {
+      model: 'NSK 6207ZZ',
+      installationDate: '2023.09.10',
+      load: '1000 N',
+      initialOperatingTimeMs: 4200 * 3600 * 1000, // 베어링 4의 초기 운영 시간
+    },
+  };
+
+  const currentBearing = bearingData[bearingId] || bearingData.bearing1; // 기본값 설정
+
+  const [operatingTimeMs, setOperatingTimeMs] = useState(currentBearing.initialOperatingTimeMs); // 초기 운영 시간 설정
 
   const [currentTime, setCurrentTime] = useState(null);
 
@@ -87,11 +117,11 @@ export default function BearingInfo() {
           <div className="space-y-3 mb-6">
             <div className="flex justify-between">
               <span className="text-gray-600">모델명:</span>
-              <span className="font-medium">SKF 6205-2RS</span>
+              <span className="font-medium">{currentBearing.model}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">설치일:</span>
-              <span className="font-medium">2024.01.15</span>
+              <span className="font-medium">{currentBearing.installationDate}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">운영시간:</span>
@@ -99,7 +129,7 @@ export default function BearingInfo() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">하중:</span>
-              <span className="font-medium">850 N</span>
+              <span className="font-medium">{currentBearing.load}</span>
             </div>
           </div>
           
