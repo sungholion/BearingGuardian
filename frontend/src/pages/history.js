@@ -9,9 +9,13 @@ import DefectDifferenceChart from '../components/DefectDifferenceChart';
 import { useTheme } from '../contexts/ThemeContext';
 
 // ReportControls 컴포넌트가 handleDownloadReport 함수와 isDownloading, libsLoaded 상태를 받도록 변경
-function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme }) {
+function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter }) {
   // Add a state to manage the active period button
   const [activePeriod, setActivePeriod] = useState('전체');
+
+  const handleDefectFilterChange = (event) => {
+    setDefectFilter(event.target.value);
+  };
 
   const reportControlsStyle = {
     background: theme === 'dark' ? '#2d3748' : '#fff',
@@ -129,20 +133,24 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
         }}>
           위험도순
         </button>
-        <select style={{
-          marginLeft: 10,
-          height: 36,
-          borderRadius: 8,
-          border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
-          background: theme === 'dark' ? '#1a202c' : '#fff',
-          color: theme === 'dark' ? '#e2e8f0' : '#555',
-          padding: '0 10px',
-          fontSize: 14,
-          cursor: 'pointer',
-        }}>
-          <option>전체</option>
-          <option>불량</option>
-          <option>정상</option>
+        <select
+          value={defectFilter} // defectFilter 상태와 연결
+          onChange={handleDefectFilterChange} // 변경 시 handleDefectFilterChange 호출
+          style={{
+            marginLeft: 10,
+            height: 36,
+            borderRadius: 8,
+            border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
+            background: theme === 'dark' ? '#1a202c' : '#fff',
+            color: theme === 'dark' ? '#e2e8f0' : '#555',
+            padding: '0 10px',
+            fontSize: 14,
+            cursor: 'pointer',
+          }}
+        >
+          <option value="전체">전체</option>
+          <option value="불량">불량</option>
+          <option value="정상">정상</option>
         </select>
       </div>
     </div>
@@ -155,6 +163,7 @@ export default function HistoryPage() {
   const [libsLoaded, setLibsLoaded] = useState(false);
   const [isPdfExporting, setIsPdfExporting] = useState(false); 
   const { theme } = useTheme();
+  const [defectFilter, setDefectFilter] = useState('전체'); // HistoryPage에 defectFilter 상태 추가
 
   useEffect(() => {
     const loadHtml2canvas = () => {
@@ -298,6 +307,8 @@ export default function HistoryPage() {
             isDownloading={isDownloading}
             libsLoaded={libsLoaded}
             theme={theme}
+            defectFilter={defectFilter} // ReportControls에 defectFilter 전달
+            setDefectFilter={setDefectFilter} // ReportControls에 setDefectFilter 전달
           />
 
           {/* PDF로 캡처할 컨텐츠 영역 (테이블과 차트) */}
@@ -306,7 +317,7 @@ export default function HistoryPage() {
             style={contentContainerStyle}
           >
             {/* HistoryTable */}
-            <HistoryTable isPdfExporting={isPdfExporting} /> {/* Pass the new prop here */}
+            <HistoryTable isPdfExporting={isPdfExporting} defectFilter={defectFilter} /> {/* Pass the new prop here */}
 
             {/* 하단: 2열 카드 (불량률 파이 차트, 잔여 수명 추이 차트) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>
