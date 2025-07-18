@@ -128,7 +128,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredHistoryData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = isPdfExporting ? filteredHistoryData : filteredHistoryData.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(filteredHistoryData.length / itemsPerPage);
 

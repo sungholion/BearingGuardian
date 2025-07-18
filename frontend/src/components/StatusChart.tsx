@@ -193,15 +193,15 @@ export default function StatusChart() {
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300 h-full flex flex-col">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">상태</h2>
+        <h2 className="text-2xl font-bold">실시간 이상 유형 분류</h2>
         <span className="text-sm text-gray-500">{currentTime ? formatDateTime(currentTime) : ''}</span>
       </div>
-      <p className="text-sm text-gray-600 mb-6">베어링 구성 요소별 상태를 분석합니다</p>
+      <p className="text-sm text-gray-600 mb-6">현재 베어링의 이상 유형을 판별합니다</p>
 
       <div className="flex flex-row gap-4 flex-1 min-h-[172px] items-start">
         {/* --- 도넛 차트 --- */}
         <div className="flex flex-col items-center justify-start w-70">
-          <h4 className="text-lg font-bold mb-2">누적 품질 현황</h4> {/* 타이틀 */}
+          <h4 className="text-lg font-bold mb-2">실시간 이상 유형 확률</h4> {/* 타이틀 */}
 
           <div className="relative w-56 h-56 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -244,7 +244,7 @@ export default function StatusChart() {
         </div>
 
         <div className="flex-1 flex flex-col gap-7 justify-start">
-          <h4 className="text-lg font-bold mb-2">실시간 불량 건수</h4>
+          <h4 className="text-lg font-bold mb-2">실시간 누적 불량 건수</h4>
 
           {barList.map(({ label, value, color }) => (
             <div key={label}>
