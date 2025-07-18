@@ -44,7 +44,7 @@ export default function RemainingLifeTrendChart() {
         marginBottom: 20,
       }}>
         <span style={{
-          fontSize: 20,
+          fontSize: 26,
           fontWeight: 'bold',
           color: '#222',
           letterSpacing: -1,

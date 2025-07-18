@@ -21,7 +21,7 @@ export default function DefectDifferenceChart() {
   const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percent }) => {
     if (value === 0) return null;
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 0.58; // This controls how far the label is from the center
+    const radius = outerRadius * 0.65; // This controls how far the label is from the center
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 

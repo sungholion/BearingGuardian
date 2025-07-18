@@ -28,20 +28,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/history": [
+    "/bearing2": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/history.js"
+      "static/chunks/pages/bearing2.js"
     ],
-    "/settings": [
+    "/bearing3": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/settings.js"
+      "static/chunks/pages/bearing3.js"
     ],
-    "/settings/logs": [
+    "/bearing4": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/settings/logs.js"
+      "static/chunks/pages/bearing4.js"
     ]
   },
   "ampFirstPages": []

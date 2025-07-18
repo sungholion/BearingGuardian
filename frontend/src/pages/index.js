@@ -34,6 +34,7 @@ export default function Home() {
 
   const [rulValue, setRulValue] = useState(75);
   const [confidenceValue, setConfidenceValue] = useState(87);
+  const [notifications, setNotifications] = useState([]); // 알림 상태 추가
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -79,13 +80,13 @@ export default function Home() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* 헤더 */}
         
-        <Header />
+        <Header notifications={notifications} setNotifications={setNotifications} />
         {/* 카드 2열 레이아웃 */}
         <div style={{ flex: 1, padding: '0 32px 32px 32px', display: 'flex', gap: 24 }}>
           {/* (왼쪽) */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={cardStyle}>
-              <BearingInfo />
+              <BearingInfo bearingId="bearing1" />
             </div>
             <div style={cardStyle}>
               <FrequencyAnalysis />

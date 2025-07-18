@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import HistoryTable from '../components/HistoryTable';
 import RemainingLifeTrendChart from '../components/RemainingLifeTrendChart';
 import DefectDifferenceChart from '../components/DefectDifferenceChart';
+import ManyBearingHistory from '../components/ManyBearingHistory';
 
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -319,13 +320,16 @@ export default function HistoryPage() {
             {/* HistoryTable */}
             <HistoryTable isPdfExporting={isPdfExporting} defectFilter={defectFilter} /> {/* Pass the new prop here */}
 
-            {/* 하단: 2열 카드 (불량률 파이 차트, 잔여 수명 추이 차트) */}
+            {/* 하단: 3열 카드 (불량률 파이 차트, 잔여 수명 추이 차트, 다중 베어링 이력) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>
               <div style={{ flex: 1, minWidth: '0' }}>
                 <DefectDifferenceChart />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
                 <RemainingLifeTrendChart />
+              </div>
+              <div style={{ flex: 1, minWidth: '0' }}>
+                <ManyBearingHistory />
               </div>
             </div>
           </div>
