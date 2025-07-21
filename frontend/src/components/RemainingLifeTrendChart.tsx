@@ -1,6 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts';
 
-export default function RemainingLifeTrendChart() {
+export default function RemainingLifeTrendChart({ selectedBearing }) {
   // 정적인 누적 잔여 수명 데이터 (예시)
   const data = [
     { date: '2025-07-01', '잔여 사이클 수': 95.0 },
@@ -49,7 +49,7 @@ export default function RemainingLifeTrendChart() {
           color: '#222',
           letterSpacing: -1,
         }}>
-          누적 잔여 사이클 수 추이
+          누적 잔여 사이클 수 추이 - {selectedBearing === '전체' ? '전체' : selectedBearing}
         </span>
       </div>
       <ResponsiveContainer width="100%" height="90%">

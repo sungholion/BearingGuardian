@@ -3,12 +3,37 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import React from 'react';
 
-export default function DefectDifferenceChart() {
-  const pieData = [
-    { name: 'Normal', value: 21090},
-    { name: 'IR', value:  	13478},
-    { name: 'OR', value: 8632},
-  ];
+export default function DefectDifferenceChart({ selectedBearing }) {
+  const data = {
+  '전체': [
+    { name: 'Normal', value: 99360 },
+    { name: 'IR', value: 47520 },
+    { name: 'OR', value: 25920 },
+  ],
+  'B001': [
+    { name: 'Normal', value: 25920 },
+    { name: 'IR', value: 10800 },
+    { name: 'OR', value: 6480 },
+  ],
+  'B002': [
+    { name: 'Normal', value: 23760 },
+    { name: 'IR', value: 12960 },
+    { name: 'OR', value: 6480 },
+  ],
+  'B003': [
+    { name: 'Normal', value: 21600 },
+    { name: 'IR', value: 15120 },
+    { name: 'OR', value: 6480 },
+  ],
+  'B004': [
+    { name: 'Normal', value: 28080 },
+    { name: 'IR', value: 8640 },
+    { name: 'OR', value: 6480 },
+  ],
+};
+
+  const pieData = data[selectedBearing] || data['전체'];
+
   const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF'];
 
   const total = pieData.reduce((sum, entry) => sum + entry.value, 0);
@@ -74,7 +99,7 @@ export default function DefectDifferenceChart() {
           color: '#222',
           letterSpacing: -1,
         }}>
-          불량률 파이 차트
+          불량률 파이 차트 - {selectedBearing === '전체' ? '전체' : selectedBearing}
         </span>
 
       </div>
