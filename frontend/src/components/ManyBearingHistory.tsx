@@ -2,10 +2,10 @@ import React, { forwardRef } from 'react';
 
 const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
   const data = [
-    { label: '베어링 1', value: 85 },
-    { label: '베어링 2', value: 60 },
-    { label: '베어링 3', value: 75 },
-    { label: '베어링 4', value: 90 },
+    { label: 'B001', value: 74.4 },
+    { label: 'B002', value: 55.2 },
+    { label: 'B003', value: 99.7 },
+    { label: 'B004', value: 93.4 },
   ];
 
   const chartWidth = 800;
