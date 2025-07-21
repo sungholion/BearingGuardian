@@ -109,7 +109,7 @@ export default function Bearing2Page() {
             gap: 24,
           }}>
             <div style={cardStyle}>
-              <StatusChart />
+              <StatusChart bearingId="B002" />
             </div>
             <div style={cardStyle}>
               {/* RUL 예측 (개선된 버전) */}

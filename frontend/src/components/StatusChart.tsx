@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-export default function StatusChart() {
+export default function StatusChart({ bearingId }) {
   const [bearingStatus, setBearingStatus] = useState('정상'); // Initial status
   const [statusCircleColor, setStatusCircleColor] = useState('#10b981'); // Initial color for 'Normal'
   const [normalCount, setNormalCount] = useState(0);
@@ -21,6 +21,27 @@ export default function StatusChart() {
     { label: 'IR', value: 0, color: '#ef4444' },
     { label: 'OR', value: 0, color: '#f59e0b' },
   ]);
+
+  useEffect(() => {
+    // Set initial counts based on bearingId
+    if (bearingId === 'B002') {
+      setIrCount(5); // Example initial value for B002 IR
+      setNormalCount(10);
+      setOrCount(2);
+    } else if (bearingId === 'B003') {
+      setOrCount(7); // Example initial value for B003 OR
+      setNormalCount(8);
+      setIrCount(3);
+    } else if (bearingId === 'B004') {
+      setNormalCount(12); // Example initial value for B004 Normal
+      setIrCount(4);
+      setOrCount(6);
+    } else {
+      setNormalCount(0);
+      setIrCount(0);
+      setOrCount(0);
+    }
+  }, [bearingId]);
 
   // Update current time every second
   useEffect(() => {

@@ -6,11 +6,13 @@ import HistoryTable from '../components/HistoryTable';
 import RemainingLifeTrendChart from '../components/RemainingLifeTrendChart';
 import DefectDifferenceChart from '../components/DefectDifferenceChart';
 import ManyBearingHistory from '../components/ManyBearingHistory';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 import { useTheme } from '../contexts/ThemeContext';
 
 // ReportControls 컴포넌트가 handleDownloadReport 함수와 isDownloading, libsLoaded 상태를 받도록 변경
-function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter, selectedPeriod, setSelectedPeriod, selectedStartDate, setSelectedStartDate, selectedEndDate, setSelectedEndDate, selectedBearing, setSelectedBearing }) {
+function ReportControls({ handleDownloadReport, isDownloading, theme, defectFilter, setDefectFilter, selectedPeriod, setSelectedPeriod, selectedStartDate, setSelectedStartDate, selectedEndDate, setSelectedEndDate, selectedBearing, setSelectedBearing }) {
   // Add a state to manage the active period button
   const [activePeriod, setActivePeriod] = useState('전체');
 
@@ -53,22 +55,22 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
         </div>
         <button
           onClick={handleDownloadReport}
-          disabled={isDownloading || !libsLoaded}
+          disabled={isDownloading}
           style={{
             padding: '8px 16px',
             borderRadius: 8,
             border: 'none',
             background: '#007bff',
             color: '#fff',
-            cursor: (isDownloading || !libsLoaded) ? 'not-allowed' : 'pointer',
+            cursor: isDownloading ? 'not-allowed' : 'pointer',
             fontSize: '14px',
             fontWeight: 500,
-            opacity: (isDownloading || !libsLoaded) ? 0.7 : 1,
+            opacity: isDownloading ? 0.7 : 1,
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             transition: 'background-color 0.2s ease, opacity 0.2s ease',
           }}
         >
-          {isDownloading ? '다운로드 중...' : !libsLoaded ? '라이브러리 로드 중...' : '보고서 다운로드'}
+          {isDownloading ? '다운로드 중...' : '보고서 다운로드'}
         </button>
       </div>
 
@@ -189,8 +191,11 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
 
 export default function HistoryPage() {
   const contentToPrintRef = useRef(null);
+  const historyTableRef = useRef(null);
+  const defectDifferenceChartRef = useRef(null);
+  const remainingLifeTrendChartRef = useRef(null);
+  const manyBearingHistoryRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [libsLoaded, setLibsLoaded] = useState(false);
   const [isPdfExporting, setIsPdfExporting] = useState(false); 
   const { theme } = useTheme();
   const [defectFilter, setDefectFilter] = useState('전체');
@@ -210,117 +215,89 @@ export default function HistoryPage() {
     { id: 9, message: '데이터베이스 서버 점검 (2025-07-21 23:00)', timestamp: '2025-07-21 11:25:00' },
   ]);
 
-  useEffect(() => {
-    const loadHtml2canvas = () => {
-      return new Promise((resolve, reject) => {
-        if (typeof window !== 'undefined' && window.html2canvas) {
-          resolve(true);
-          return;
-        }
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('html2canvas 로드 실패'));
-        document.head.appendChild(script);
-      });
-    };
+  const handleDownloadReport = async () => {
+    setIsDownloading(true);
+    setIsPdfExporting(true);
 
-    const loadJsPDF = () => {
-      return new Promise((resolve, reject) => {
-        if (typeof window !== 'undefined' && window.jspdf) {
-          resolve(true);
-          return;
-        }
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('jspdf 로드 실패'));
-        document.head.appendChild(script);
-      });
-    };
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const margin = 10; // mm
+    let yOffset = margin; // Current Y position in PDF
 
-    const loadLibraries = async () => {
+    const addComponentToPdf = async (componentRef, title) => {
+      if (!componentRef.current) {
+        console.warn(`Skipping ${title}: component ref is null.`);
+        return;
+      }
+
+      console.log(`Attempting to capture ${title}...`);
+
+      // Temporarily set a fixed width for capture to ensure consistent scaling
+      const originalWidth = componentRef.current.style.width;
+      componentRef.current.style.width = '100%'; // Ensure it takes full width for capture
+
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
       try {
-        await loadHtml2canvas();
-        await loadJsPDF();
-        setLibsLoaded(true);
+        const canvas = await html2canvas(componentRef.current, {
+          scale: 1, // Lower scale for potentially better stability
+          useCORS: true,
+          logging: false,
+          backgroundColor: theme === 'dark' ? '#2d3748' : '#fff',
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+
+        if (imgData === 'data:,') {
+          console.error(`html2canvas failed to generate valid image data for ${title}. Skipping this component.`);
+          return; // Skip this component if image data is invalid
+        }
+
+        console.log(`${title} captured. Image data length: ${imgData.length}`);
+
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgPdfWidth = pdfWidth - 2 * margin;
+        const imgPdfHeight = (imgProps.height * imgPdfWidth) / imgProps.width;
+
+        // Check if current component fits on current page
+        if (yOffset + imgPdfHeight + margin > pdf.internal.pageSize.getHeight()) {
+          pdf.addPage();
+          yOffset = margin; // Reset yOffset for new page
+        }
+
+        pdf.addImage(imgData, 'PNG', margin, yOffset, imgPdfWidth, imgPdfHeight);
+        yOffset += imgPdfHeight + margin; // Move yOffset down for next component
+
       } catch (error) {
-        console.error("라이브러리 로드 중 오류 발생:", error);
-        setLibsLoaded(false);
+        console.error(`Error capturing ${title}:`, error);
+      } finally {
+        // Restore original width
+        componentRef.current.style.width = originalWidth;
       }
     };
-
-    loadLibraries();
-
-    return () => {
-      const html2canvasScript = document.querySelector('script[src*="html2canvas"]');
-      const jspdfScript = document.querySelector('script[src*="jspdf"]');
-      if (html2canvasScript) html2canvasScript.remove();
-      if (jspdfScript) jspdfScript.remove();
-    };
-  }, []);
-
-  const handleDownloadReport = async () => {
-    if (!contentToPrintRef.current) {
-      console.error("PDF로 저장할 컨텐츠를 찾을 수 없습니다.");
-      return;
-    }
-
-    if (!libsLoaded) {
-      console.warn("PDF 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.");
-      return;
-    }
-
-    setIsDownloading(true);
-    setIsPdfExporting(true); // Set to true before capture
-
-    // Use requestAnimationFrame to ensure the DOM updates before html2canvas captures
-    await new Promise(resolve => requestAnimationFrame(resolve));
 
     try {
-      // @ts-ignore
-      const html2canvas = window.html2canvas;
-      // @ts-ignore
-      const jsPDF = window.jspdf.jsPDF;
+      // Add Header (optional, if you want to include it in the PDF)
+      // await addComponentToPdf(headerRef, 'Header');
 
-      const canvas = await html2canvas(contentToPrintRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: theme === 'dark' ? '#2d3748' : '#fff',
-      });
+      // Add ReportControls (optional)
+      // await addComponentToPdf(reportControlsRef, 'Report Controls');
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const imgPdfWidth = pdfWidth - 20;
-      const imgPdfHeight = (imgProps.height * imgPdfWidth) / imgProps.width;
-
-      let heightLeft = imgPdfHeight;
-      let position = 10;
-
-      pdf.addImage(imgData, 'PNG', 10, position, imgPdfWidth, imgPdfHeight);
-      heightLeft -= (pdfHeight - position);
-
-      while (heightLeft > 0) {
-        position = -heightLeft + 10;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 10, position, imgPdfWidth, imgPdfHeight);
-        heightLeft -= pdfHeight;
-      }
+      // await addComponentToPdf(historyTableRef, 'History Table');
+      await addComponentToPdf(defectDifferenceChartRef, 'Defect Difference Chart');
+      await addComponentToPdf(remainingLifeTrendChartRef, 'Remaining Life Trend Chart');
+      await addComponentToPdf(manyBearingHistoryRef, 'Many Bearing History');
 
       pdf.save("보고서.pdf");
+
     } catch (error) {
       console.error("보고서 다운로드 중 오류 발생:", error);
       alert("보고서 다운로드 중 오류가 발생했습니다.");
     } finally {
       setIsDownloading(false);
-      setIsPdfExporting(false); // Set back to false after capture
+      setIsPdfExporting(false);
     }
-  };
+  }; // Missing closing brace for handleDownloadReport was here
 
   const pageStyle = {
     display: 'flex',
@@ -350,7 +327,6 @@ export default function HistoryPage() {
           <ReportControls
             handleDownloadReport={handleDownloadReport}
             isDownloading={isDownloading}
-            libsLoaded={libsLoaded}
             theme={theme}
             defectFilter={defectFilter}
             setDefectFilter={setDefectFilter}
@@ -371,6 +347,7 @@ export default function HistoryPage() {
           >
             {/* HistoryTable */}
             <HistoryTable 
+              ref={historyTableRef}
               isPdfExporting={isPdfExporting} 
               defectFilter={defectFilter} 
               selectedPeriod={selectedPeriod}
@@ -381,13 +358,13 @@ export default function HistoryPage() {
             {/* 하단: 3열 카드 (불량률 파이 차트, 잔여 수명 추이 차트, 다중 베어링 이력) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <DefectDifferenceChart selectedBearing={selectedBearing} />
+                <DefectDifferenceChart ref={defectDifferenceChartRef} selectedBearing={selectedBearing} />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <RemainingLifeTrendChart selectedBearing={selectedBearing} />
+                <RemainingLifeTrendChart ref={remainingLifeTrendChartRef} selectedBearing={selectedBearing} />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <ManyBearingHistory selectedBearing={selectedBearing} />
+                <ManyBearingHistory ref={manyBearingHistoryRef} selectedBearing={selectedBearing} />
               </div>
             </div>
           </div>
