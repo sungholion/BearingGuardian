@@ -2,10 +2,10 @@ import React, { forwardRef } from 'react';
 
 const ManyBearingHistory = forwardRef(({ selectedBearing, selectedPeriod, selectedStartDate, selectedEndDate, getPeriodText }, ref) => {
   const allBearingsData = {
-    B001: { label: '베어링 1', value: 74.7 },
-    B002: { label: '베어링 2', value: 54.8 },
-    B003: { label: '베어링 3', value: 99.6 },
-    B004: { label: '베어링 4', value: 92.1 },
+    B001: { label: 'B001', value: 74.7 },
+    B002: { label: 'B002', value: 54.8 },
+    B003: { label: 'B003', value: 99.6 },
+    B004: { label: 'B004', value: 92.1 },
   };
 
   const displayData = selectedBearing === '전체' ? Object.values(allBearingsData) : [allBearingsData[selectedBearing]];
