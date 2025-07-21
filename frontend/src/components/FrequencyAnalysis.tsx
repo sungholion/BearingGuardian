@@ -99,7 +99,7 @@ export default function FrequencyAnalysis() {
     <Card className="h-full flex flex-col">
       <CardHeader className="flex flex-col space-y-1.5 p-6">
         <CardTitle className="text-2xl font-bold">실시간 주파수 분석</CardTitle>
-        <CardDescription className="text-sm text-gray-600">베어링의 실시간 주파수 변화와 평균 변동을 분석합니다</CardDescription>
+        <CardDescription className="text-sm text-gray-600">베어링의 실시간 주파수 변화와 히트맵으로 패턴을 확인합니다</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 p-6 pt-0">
         <div className="grid grid-cols-2 gap-6 flex-1">

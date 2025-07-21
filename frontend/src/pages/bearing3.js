@@ -32,13 +32,24 @@ export default function Bearing3Page() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { theme } = useTheme();
 
-  const [rulValue, setRulValue] = useState(75);
+  const [rulValue, setRulValue] = useState(112);
   const [confidenceValue, setConfidenceValue] = useState(87);
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: '베어링 1 온도 임계치 초과', timestamp: '2025-07-21 12:01:00' },
+    { id: 2, message: '베어링 3 외륜 결함 발생', timestamp: '2025-07-21 12:00:00' },
+    { id: 3, message: '시스템 정기 점검 예정 (2025-07-22 09:00)', timestamp: '2025-07-21 11:55:00' },
+    { id: 4, message: '베어링 4 내륜 결함 의심', timestamp: '2025-07-21 11:50:00' },
+    { id: 5, message: '베어링 2 온도 센서 오류 감지', timestamp: '2025-07-21 11:45:00' },
+    { id: 6, message: '베어링 1 외륜 결함 심화', timestamp: '2025-07-21 11:40:00' },
+    { id: 7, message: '전체 시스템 긴급 점검 필요', timestamp: '2025-07-21 11:35:00' },
+    { id: 8, message: '베어링 3 온도 정상 범위 복귀', timestamp: '2025-07-21 11:30:00' },
+    { id: 9, message: '데이터베이스 서버 점검 (2025-07-21 23:00)', timestamp: '2025-07-21 11:25:00' },
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRulValue(prevRul => {
-        const change = (Math.random() * 0.4 - 0.2); // -0.2 to +0.2
+        const change = (Math.random() > 0.5 ? 0.1 : -0.1);
         const newRul = Math.max(0, Math.min(100, prevRul + change));
         return parseFloat(newRul.toFixed(1));
       });
@@ -79,7 +90,7 @@ export default function Bearing3Page() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* 헤더 */}
         
-        <Header />
+        <Header notifications={notifications} setNotifications={setNotifications} />
         {/* 카드 2열 레이아웃 */}
         <div style={{ flex: 1, padding: '0 32px 32px 32px', display: 'flex', gap: 24 }}>
           {/* (왼쪽) */}
@@ -106,7 +117,7 @@ export default function Bearing3Page() {
               <Card className="col-span-6 rounded-lg border bg-card text-card-foreground shadow-sm">
                 <CardHeader className="flex flex-col space-y-1.5 p-6">
                   <CardTitle className="text-2xl font-bold">예측 수명 분석</CardTitle>
-                  <div className="text-sm text-gray-500">잔존의 예측 수명을 분석합니다</div>
+                  <div className="text-sm text-gray-500">잔여 수명을 예측합니다</div>
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
                   <div className="grid grid-cols-2 gap-6">

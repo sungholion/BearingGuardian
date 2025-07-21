@@ -2,7 +2,7 @@
         <Card className="col-span-6">
           <CardHeader>
             <CardTitle className="text-lg">예측 수명 분석</CardTitle>
-            <div className="text-sm text-gray-500">잔존의 예측 수명을 분석합니다</div>
+            <div className="text-sm text-gray-500">잔여 수명을 예측합니다</div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-6">
