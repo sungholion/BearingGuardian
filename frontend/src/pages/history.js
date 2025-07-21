@@ -10,7 +10,7 @@ import ManyBearingHistory from '../components/ManyBearingHistory';
 import { useTheme } from '../contexts/ThemeContext';
 
 // ReportControls 컴포넌트가 handleDownloadReport 함수와 isDownloading, libsLoaded 상태를 받도록 변경
-function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter, selectedPeriod, setSelectedPeriod, selectedStartDate, setSelectedStartDate, selectedEndDate, setSelectedEndDate }) {
+function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter, selectedPeriod, setSelectedPeriod, selectedStartDate, setSelectedStartDate, selectedEndDate, setSelectedEndDate, selectedBearing, setSelectedBearing }) {
   // Add a state to manage the active period button
   const [activePeriod, setActivePeriod] = useState('전체');
 
@@ -44,10 +44,11 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <span style={{ marginRight: '16px' }}>HISTORY</span>
           <div>
-            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B001</button>
-            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B002</button>
-            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B003</button>
-            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B004</button>
+            <button onClick={() => setSelectedBearing('B001')} style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: selectedBearing === 'B001' ? '#e0f2ff' : '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B001</button>
+            <button onClick={() => setSelectedBearing('B002')} style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: selectedBearing === 'B002' ? '#e0f2ff' : '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B002</button>
+            <button onClick={() => setSelectedBearing('B003')} style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: selectedBearing === 'B003' ? '#e0f2ff' : '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B003</button>
+            <button onClick={() => setSelectedBearing('B004')} style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: selectedBearing === 'B004' ? '#e0f2ff' : '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B004</button>
+            <button onClick={() => setSelectedBearing('전체')} style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: selectedBearing === '전체' ? '#e0f2ff' : '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>전체</button>
           </div>
         </div>
         <button
@@ -196,6 +197,7 @@ export default function HistoryPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('전체');
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [selectedBearing, setSelectedBearing] = useState('전체');
   const [notifications, setNotifications] = useState([
     { id: 1, message: '베어링 1 온도 임계치 초과', timestamp: '2025-07-21 12:01:00' },
     { id: 2, message: '베어링 3 외륜 결함 발생', timestamp: '2025-07-21 12:00:00' },
@@ -358,6 +360,8 @@ export default function HistoryPage() {
             setSelectedStartDate={setSelectedStartDate}
             selectedEndDate={selectedEndDate}
             setSelectedEndDate={setSelectedEndDate}
+            selectedBearing={selectedBearing}
+            setSelectedBearing={setSelectedBearing}
           />
 
           {/* PDF로 캡처할 컨텐츠 영역 (테이블과 차트) */}
@@ -377,13 +381,13 @@ export default function HistoryPage() {
             {/* 하단: 3열 카드 (불량률 파이 차트, 잔여 수명 추이 차트, 다중 베어링 이력) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <DefectDifferenceChart />
+                <DefectDifferenceChart selectedBearing={selectedBearing} />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <RemainingLifeTrendChart />
+                <RemainingLifeTrendChart selectedBearing={selectedBearing} />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <ManyBearingHistory />
+                <ManyBearingHistory selectedBearing={selectedBearing} />
               </div>
             </div>
           </div>

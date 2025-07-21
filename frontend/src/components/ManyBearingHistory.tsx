@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ManyBearingHistory() {
+export default function ManyBearingHistory({ selectedBearing }) {
   const data = [
     { label: '베어링 1', value: 85 },
     { label: '베어링 2', value: 60 },
@@ -41,7 +41,7 @@ export default function ManyBearingHistory() {
           color: '#222',
           letterSpacing: -1,
         }}>
-          전체 베어링 누적 잔여 수명
+          베어링 누적 잔여 수명 - {selectedBearing === '전체' ? '전체' : selectedBearing}
         </span>
       </div>
       <svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth + yLabelWidth + 10} ${chartHeight}`}>
