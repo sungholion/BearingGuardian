@@ -41,10 +41,36 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </button>
         </div>
         <nav className="space-y-2">
-          <a href="/" className={linkClass.trim()}>
-            <i className="ri-dashboard-line text-lg"></i>
-            {!isCollapsed && <span className="ml-3 font-medium">대시보드</span>}
-          </a>
+          <div className="relative">
+            <button
+              className={`${linkClass.trim()} w-full text-left`}
+              onMouseEnter={(e) => {
+                if (!isCollapsed) {
+                  const dropdown = e.currentTarget.nextElementSibling;
+                  if (dropdown) {
+                    dropdown.classList.remove('hidden');
+                  }
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isCollapsed) {
+                  const dropdown = e.currentTarget.nextElementSibling;
+                  if (dropdown) {
+                    dropdown.classList.add('hidden');
+                  }
+                }
+              }}
+            >
+              <i className="ri-dashboard-line text-lg"></i>
+              {!isCollapsed && <span className="ml-3 font-medium">대시보드</span>}
+            </button>
+            <div className="absolute left-0 mt-2 w-full bg-white rounded-md shadow-lg hidden z-10">
+              <a href="/bearing1" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">베어링 1</a>
+              <a href="/bearing2" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">베어링 2</a>
+              <a href="/bearing3" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">베어링 3</a>
+              <a href="/bearing4" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">베어링 4</a>
+            </div>
+          </div>
           <a href="/history" className={linkClass.trim()}>
             <i className="ri-history-line text-lg"></i>
             {!isCollapsed && <span className="ml-3 font-medium">History</span>}

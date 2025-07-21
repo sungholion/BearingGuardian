@@ -2,8 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
+  "/entireBearing": "pages/entireBearing.js",
   "/bearing3": "pages/bearing3.js",
-  "/bearing2": "pages/bearing2.js",
   "/bearing4": "pages/bearing4.js"
 }

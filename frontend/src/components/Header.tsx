@@ -34,6 +34,7 @@ export default function Header({ notifications, setNotifications }) {
     { name: '베어링 2', link: '/bearing2' },
     { name: '베어링 3', link: '/bearing3' },
     { name: '베어링 4', link: '/bearing4' },
+    { name: '베어링 전체', link: '/entireBearing' },
   ];
 
   return (
@@ -80,37 +81,7 @@ export default function Header({ notifications, setNotifications }) {
         </div>
       </Link>
 
-      {/* 베어링 선택 버튼 그룹 */}
-      <div style={{ display: 'flex', gap: 15, position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-        {bearingPages.map((b) => (
-          <Link key={b.link} href={b.link} legacyBehavior>
-            <a
-              style={{
-                fontSize: "1.2rem",
-                color: b.link === activePath ? "#1646d9" : "#727171ff",
-                fontWeight: b.link === activePath ? 700 : 500,
-                textDecoration: "none",
-                padding: "7px 14px",
-                borderRadius: "8px",
-                background: "none",
-                transition: "background .15s, color .15s, font-weight .15s",
-                cursor: "pointer",
-                border: b.link === activePath ? "1px solid #1646d9" : "1px solid transparent",
-              }}
-              onMouseOver={e => {
-                e.currentTarget.style.background = "#f1f5fb";
-                e.currentTarget.style.color = "#1a3184";
-              }}
-              onMouseOut={e => {
-                e.currentTarget.style.background = "none";
-                e.currentTarget.style.color = b.link === activePath ? "#1646d9" : "#727171ff";
-              }}
-            >
-              {b.name}
-            </a>
-          </Link>
-        ))}
-      </div>
+      
       {/* 우측: 메뉴 → 알림 → 회원 아이콘 */}
       <div style={{
         display: 'flex',
@@ -120,32 +91,24 @@ export default function Header({ notifications, setNotifications }) {
         {/* 메뉴 3개 */}
         <div style={{ display: 'flex', position: 'relative', right: 100, alignItems: 'center', gap: 35 }}>
           {menus.map((m) => (
-            <Link key={m.link} href={m.link} legacyBehavior>
-              <a
-                style={{
-                  fontSize: "1.5rem",
-                  color: m.link === activePath ? "#1646d9" : "#727171ff",
-                  fontWeight: m.link === activePath ? 700 : 500,
-                  textDecoration: "none",
-                  padding: "7px 14px",
-                  borderRadius: "8px",
-                  background: "none",
-                  transition: "background .15s, color .15s, font-weight .15s",
-                  cursor: "pointer",
-                }}
-                onMouseOver={e => {
-                  e.currentTarget.style.background = "#f1f5fb";
-                  e.currentTarget.style.color = "#1a3184";
-                }}
-                onMouseOut={e => {
-                  // 현재 활성 경로와 일치하지 않을 때만 원래 색상으로 되돌립니다.
-                  e.currentTarget.style.background = "none";
-                  e.currentTarget.style.color = m.link === activePath ? "#1646d9" : "#727171ff"; // 원래 색상으로 변경
-                }}
-              >
-                {m.name}
-              </a>
-            </Link>
+            <div key={m.link} className="relative group">
+              <Link href={m.link} legacyBehavior>
+                <a
+                  className="text-lg font-medium text-gray-600 hover:text-blue-600 px-4 py-2 rounded-md transition-colors duration-200"
+                >
+                  {m.name}
+                </a>
+              </Link>
+              {m.name === "Dashboard" && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                  {bearingPages.map((b) => (
+                    <Link key={b.link} href={b.link} legacyBehavior>
+                      <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{b.name}</a>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
         {/* 아이콘 그룹: 알림 → 회원 */}
