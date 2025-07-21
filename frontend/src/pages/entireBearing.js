@@ -26,15 +26,40 @@ export default function EntireBearingPage() {
     bearing4: 93,
   });
 
+  const [remainingCyclesValues, setRemainingCyclesValues] = useState({
+    bearing1: 75 * 8640,
+    bearing2: 55 * 8640,
+    bearing3: 112 * 8640,
+    bearing4: 93 * 8640,
+  });
+
+  const [bearingStatuses, setBearingStatuses] = useState({
+    bearing1: '정상',
+    bearing2: '정상',
+    bearing3: '정상',
+    bearing4: '정상',
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
       setRulValues(prevRulValues => {
         const newRulValues = { ...prevRulValues };
+        const newCyclesValues = { ...prevRulValues };
+        const newBearingStatuses = { ...bearingStatuses }; // Get current statuses
+
         for (const bearingId of bearingIds) {
           const change = (Math.random() > 0.5 ? 0.1 : -0.1);
           const newRul = Math.max(0, Math.min(100, prevRulValues[bearingId] + change));
           newRulValues[bearingId] = parseFloat(newRul.toFixed(1));
+          newCyclesValues[bearingId] = parseFloat((newRul * 8640).toFixed(0));
+
+          // Simulate status change
+          const statuses = ['정상', '내륜 결함', '외륜 결함'];
+          const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+          newBearingStatuses[bearingId] = randomStatus;
         }
+        setRemainingCyclesValues(newCyclesValues);
+        setBearingStatuses(newBearingStatuses); // Update bearing statuses
         return newRulValues;
       });
     }, 3000);
@@ -58,7 +83,7 @@ export default function EntireBearingPage() {
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '32px', color: theme === 'dark' ? 'white' : 'black' }}>베어링 전체 현황</h1>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
             {bearingIds.map(id => (
-              <BearingSummaryCard key={id} bearingId={id} rulValue={rulValues[id]} />
+              <BearingSummaryCard key={id} bearingId={id} rulValue={rulValues[id]} remainingCycles={remainingCyclesValues[id]} currentStatus={bearingStatuses[id]} />
             ))}
           </div>
         </div>

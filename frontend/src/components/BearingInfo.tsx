@@ -9,25 +9,25 @@ export default function BearingInfo({ bearingId }) {
 
   const bearingData = {
     bearing1: {
-      model: 'SKF 6205-2RS',
+      model: 'B001 (SKF 6205-2RS)',
       installationDate: '2024.01.15',
       load: '850 N',
       initialOperatingTimeMs: 2847 * 3600 * 1000, // 베어링 1의 초기 운영 시간
     },
     bearing2: {
-      model: 'FAG 6308',
+      model: 'B002 (FAG 6308)',
       installationDate: '2023.11.01',
       load: '1200 N',
       initialOperatingTimeMs: 3500 * 3600 * 1000, // 베어링 2의 초기 운영 시간
     },
     bearing3: {
-      model: 'NTN 6006LLU',
+      model: 'B003 (NTN 6006LLU)',
       installationDate: '2024.03.20',
       load: '700 N',
       initialOperatingTimeMs: 1500 * 3600 * 1000, // 베어링 3의 초기 운영 시간
     },
     bearing4: {
-      model: 'NSK 6207ZZ',
+      model: 'B004 (NSK 6207ZZ)',
       installationDate: '2023.09.10',
       load: '1000 N',
       initialOperatingTimeMs: 4200 * 3600 * 1000, // 베어링 4의 초기 운영 시간
@@ -162,7 +162,7 @@ export default function BearingInfo({ bearingId }) {
         <div className="flex-1 flex items-center justify-center max-w-[400px] max-h-[385px]">
           <div className="w-full h-full bg-white rounded-lg border border-gray-300 flex items-center justify-center">
             <img 
-              src="/moving_bearing.gif"
+              src={`/${bearingId === 'bearing1' ? 'moving_bearing' : 'moving' + bearingId.replace('bearing', '')}.gif`}
               alt="베어링 이미지"
               className="w-full h-full object-contain rounded-lg max-w-[300px] max-h-[250px]"
             />

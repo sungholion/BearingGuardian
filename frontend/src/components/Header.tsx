@@ -30,10 +30,10 @@ export default function Header({ notifications, setNotifications }) {
 
   // 베어링 페이지 목록
   const bearingPages = [
-    { name: '베어링 1', link: '/' },
-    { name: '베어링 2', link: '/bearing2' },
-    { name: '베어링 3', link: '/bearing3' },
-    { name: '베어링 4', link: '/bearing4' },
+    { name: 'B001', link: '/' },
+    { name: 'B002', link: '/bearing2' },
+    { name: 'B003', link: '/bearing3' },
+    { name: 'B004', link: '/bearing4' },
     { name: '베어링 전체', link: '/entireBearing' },
   ];
 

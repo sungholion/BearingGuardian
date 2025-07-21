@@ -33,7 +33,7 @@ export default function Bearing4Page() {
   const { theme } = useTheme();
 
   const [rulValue, setRulValue] = useState(93);
-  const [confidenceValue, setConfidenceValue] = useState(87);
+  const [remainingCycles, setRemainingCycles] = useState(93 * 8640);
   const [notifications, setNotifications] = useState([
     { id: 1, message: '베어링 1 온도 임계치 초과', timestamp: '2025-07-21 12:01:00' },
     { id: 2, message: '베어링 3 외륜 결함 발생', timestamp: '2025-07-21 12:00:00' },
@@ -51,12 +51,11 @@ export default function Bearing4Page() {
       setRulValue(prevRul => {
         const change = (Math.random() > 0.5 ? 0.1 : -0.1);
         const newRul = Math.max(0, Math.min(100, prevRul + change));
+        setRemainingCycles(prevCycles => {
+          const newCycles = Math.max(0, newRul * 8640); // RUL * 8640
+          return parseFloat(newCycles.toFixed(0));
+        });
         return parseFloat(newRul.toFixed(1));
-      });
-      setConfidenceValue(prevConfidence => {
-        const change = (Math.random() * 0.4 - 0.2); // -0.2 to +0.2
-        const newConfidence = Math.max(0, Math.min(100, prevConfidence + change));
-        return parseFloat(newConfidence.toFixed(1));
       });
     }, 3000);
 
@@ -121,11 +120,11 @@ export default function Bearing4Page() {
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
                   <div className="grid grid-cols-2 gap-6">
-                    <div className="flex flex-col items-center">
-                      <RULGauge value={rulValue} maxValue={100} unit="일" confidence={confidenceValue} />
+                    <div className="flex flex-col items-center mt-6">
+                      <RULGauge value={rulValue} maxValue={100} unit="일" remainingCycles={remainingCycles} />
                       <div className="mt-4 text-center">
-                        <div className="text-sm text-gray-500">예상 잔존수명</div>
-                        <div className="text-lg font-bold">{rulValue.toFixed(1)}일</div>
+                        <div className="text-sm text-gray-500 mt-2">잔여 사이클 수</div>
+                        <div className="text-lg font-bold">{remainingCycles.toLocaleString()} 사이클</div>
                       </div>
                     </div>
 
@@ -181,3 +180,5 @@ export default function Bearing4Page() {
     </div>
   );
 }
+
+                  

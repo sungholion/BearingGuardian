@@ -67,10 +67,7 @@ export function RULGauge({ value, maxValue, unit, confidence }: RULGaugeProps) {
         </text>
       </svg>
 
-      {/* 신뢰도 표시 */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-        <div className="text-sm text-gray-500">신뢰도: {confidence}%</div>
-      </div>
+     
     </div>
   );
 }
