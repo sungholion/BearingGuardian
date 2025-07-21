@@ -1,19 +1,21 @@
 import React, { forwardRef } from 'react';
 
 const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
-  const data = [
-    { label: 'B001', value: 74.4 },
-    { label: 'B002', value: 55.2 },
-    { label: 'B003', value: 99.7 },
-    { label: 'B004', value: 93.4 },
-  ];
+  const allBearingsData = {
+    B001: { label: '베어링 1', value: 74.7 },
+    B002: { label: '베어링 2', value: 54.8 },
+    B003: { label: '베어링 3', value: 99.6 },
+    B004: { label: '베어링 4', value: 92.1 },
+  };
+
+  const displayData = selectedBearing === '전체' ? Object.values(allBearingsData) : [allBearingsData[selectedBearing]];
 
   const chartWidth = 800;
   const yLabelWidth = 60;
   const barStart = yLabelWidth + 5;
   const barHeight = 50; // Increased for larger bars
   const gap = 20;
-  const chartHeight = data.length * barHeight + (data.length - 1) * gap + 40; // Auto-calculated height
+  const chartHeight = displayData.length * barHeight + (displayData.length - 1) * gap + 40; // Auto-calculated height
 
   return (
     <div
@@ -70,7 +72,7 @@ const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
             </g>
           );
         })}
-        {data.map((item, idx) => {
+        {displayData.map((item, idx) => {
           const y = idx * (barHeight + gap) + 4;
           const barLen = (item.value / 100) * chartWidth;
           return (
