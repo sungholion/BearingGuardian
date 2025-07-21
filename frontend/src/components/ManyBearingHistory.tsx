@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
+const ManyBearingHistory = forwardRef(({ selectedBearing, selectedPeriod, selectedStartDate, selectedEndDate, getPeriodText }, ref) => {
   const allBearingsData = {
     B001: { label: '베어링 1', value: 74.7 },
     B002: { label: '베어링 2', value: 54.8 },
@@ -44,7 +44,7 @@ const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
           color: '#222',
           letterSpacing: -1,
         }}>
-          베어링 누적 잔여 수명 - {selectedBearing === '전체' ? '전체' : selectedBearing}
+          베어링 누적 잔여 수명 - {getPeriodText(selectedPeriod, selectedStartDate, selectedEndDate)}
         </span>
       </div>
       <svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth + yLabelWidth + 10} ${chartHeight}`}>

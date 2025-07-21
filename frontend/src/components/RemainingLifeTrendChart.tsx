@@ -1,7 +1,7 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot, Legend } from 'recharts';
 import React, { forwardRef } from 'react';
 
-const RemainingLifeTrendChart = forwardRef(({ selectedBearing }, ref) => {
+const RemainingLifeTrendChart = forwardRef(({ selectedBearing, selectedPeriod, selectedStartDate, selectedEndDate, getPeriodText }, ref) => {
   // 0-100 범위의 값을 5000만-9000만 범위로 변환하는 헬퍼 함수
   const convertToRealisticValue = (value) => {
     // 0-100 범위의 값에 소수점과 약간의 무작위성을 추가
@@ -131,7 +131,7 @@ const RemainingLifeTrendChart = forwardRef(({ selectedBearing }, ref) => {
           color: '#222',
           letterSpacing: -1,
         }}>
-          누적 잔여 사이클 수 추이 - {selectedBearing === '전체' ? '전체' : selectedBearing}
+          누적 잔여 사이클 수 추이 - {getPeriodText(selectedPeriod, selectedStartDate, selectedEndDate)}
         </span>
       </div>
       <ResponsiveContainer width="100%" height="90%">

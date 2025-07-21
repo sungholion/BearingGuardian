@@ -3,7 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import React, { forwardRef } from 'react';
 
-const DefectDifferenceChart = forwardRef(({ selectedBearing }, ref) => {
+const DefectDifferenceChart = forwardRef(({ selectedBearing, selectedPeriod, selectedStartDate, selectedEndDate }, ref) => {
   const data = {
   '전체': [
     { name: 'Normal', value: 99360 },
@@ -73,6 +73,41 @@ const DefectDifferenceChart = forwardRef(({ selectedBearing }, ref) => {
     );
   };
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getPeriodText = (period, startDate, endDate) => {
+    const today = new Date();
+    const todayFormatted = formatDate(today);
+
+    if (period === '오늘') {
+      return `오늘 (${todayFormatted})`;
+    } else if (period === '1주') {
+      const oneWeekAgo = new Date(today);
+      oneWeekAgo.setDate(today.getDate() - 7);
+      return `1주일 (${formatDate(oneWeekAgo)} ~ ${todayFormatted})`;
+    } else if (period === '1개월') {
+      const oneMonthAgo = new Date(today);
+      oneMonthAgo.setMonth(today.getMonth() - 1);
+      return `1개월 (${formatDate(oneMonthAgo)} ~ ${todayFormatted})`;
+    } else if (period === '1년') {
+      const oneYearAgo = new Date(today);
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      return `1년 (${formatDate(oneYearAgo)} ~ ${todayFormatted})`;
+    } else if (period === '사용자 지정' && startDate && endDate) {
+      return `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
+    } else if (period === '전체') {
+      return '전체';
+    }
+    return period;
+  };
+
+  const periodText = getPeriodText(selectedPeriod, selectedStartDate, selectedEndDate);
+
   return (
     <div
       ref={ref}
@@ -100,7 +135,7 @@ const DefectDifferenceChart = forwardRef(({ selectedBearing }, ref) => {
           color: '#222',
           letterSpacing: -1,
         }}>
-          불량률 파이 차트 - {selectedBearing === '전체' ? '전체' : selectedBearing}
+          불량률 파이 차트 - {getPeriodText(selectedPeriod, selectedStartDate, selectedEndDate)}
         </span>
 
       </div>

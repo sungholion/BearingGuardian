@@ -215,6 +215,39 @@ export default function HistoryPage() {
     { id: 9, message: '데이터베이스 서버 점검 (2025-07-21 23:00)', timestamp: '2025-07-21 11:25:00' },
   ]);
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getPeriodText = (period, startDate, endDate) => {
+    const today = new Date();
+    const todayFormatted = formatDate(today);
+
+    if (period === '오늘') {
+      return `오늘 (${todayFormatted})`;
+    } else if (period === '1주') {
+      const oneWeekAgo = new Date(today);
+      oneWeekAgo.setDate(today.getDate() - 7);
+      return `1주일 (${formatDate(oneWeekAgo)} ~ ${todayFormatted})`;
+    } else if (period === '1개월') {
+      const oneMonthAgo = new Date(today);
+      oneMonthAgo.setMonth(today.getMonth() - 1);
+      return `1개월 (${formatDate(oneMonthAgo)} ~ ${todayFormatted})`;
+    } else if (period === '1년') {
+      const oneYearAgo = new Date(today);
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      return `1년 (${formatDate(oneYearAgo)} ~ ${todayFormatted})`;
+    } else if (period === '사용자 지정' && startDate && endDate) {
+      return `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
+    } else if (period === '전체') {
+      return '전체';
+    }
+    return period;
+  };
+
   const handleDownloadReport = async () => {
     setIsDownloading(true);
     setIsPdfExporting(true);
@@ -347,24 +380,46 @@ export default function HistoryPage() {
           >
             {/* HistoryTable */}
             <HistoryTable 
-              ref={historyTableRef}
+              ref={historyTableRef} 
               isPdfExporting={isPdfExporting} 
               defectFilter={defectFilter} 
               selectedPeriod={selectedPeriod}
               selectedStartDate={selectedStartDate}
               selectedEndDate={selectedEndDate}
+              getPeriodText={getPeriodText}
             />
 
             {/* 하단: 3열 카드 (불량률 파이 차트, 잔여 수명 추이 차트, 다중 베어링 이력) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <DefectDifferenceChart ref={defectDifferenceChartRef} selectedBearing={selectedBearing} />
+                <DefectDifferenceChart 
+                  ref={defectDifferenceChartRef} 
+                  selectedBearing={selectedBearing}
+                  selectedPeriod={selectedPeriod}
+                  selectedStartDate={selectedStartDate}
+                  selectedEndDate={selectedEndDate}
+                  getPeriodText={getPeriodText}
+                />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <RemainingLifeTrendChart ref={remainingLifeTrendChartRef} selectedBearing={selectedBearing} />
+                <RemainingLifeTrendChart 
+                  ref={remainingLifeTrendChartRef} 
+                  selectedBearing={selectedBearing}
+                  selectedPeriod={selectedPeriod}
+                  selectedStartDate={selectedStartDate}
+                  selectedEndDate={selectedEndDate}
+                  getPeriodText={getPeriodText}
+                />
               </div>
               <div style={{ flex: 1, minWidth: '0' }}>
-                <ManyBearingHistory ref={manyBearingHistoryRef} selectedBearing={selectedBearing} />
+                <ManyBearingHistory 
+                  ref={manyBearingHistoryRef} 
+                  selectedBearing={selectedBearing}
+                  selectedPeriod={selectedPeriod}
+                  selectedStartDate={selectedStartDate}
+                  selectedEndDate={selectedEndDate}
+                  getPeriodText={getPeriodText}
+                />
               </div>
             </div>
           </div>
