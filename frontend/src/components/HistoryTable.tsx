@@ -9,10 +9,11 @@ interface HistoryTableProps {
   selectedPeriod: string;
   selectedStartDate: Date | null;
   selectedEndDate: Date | null;
+  getPeriodText: (period: string, startDate: Date | null, endDate: Date | null) => string;
 }
 
 // Update the function signature to accept props and ref
-const HistoryTable = forwardRef<HTMLDivElement, HistoryTableProps>(({ isPdfExporting, defectFilter, selectedPeriod, selectedStartDate, selectedEndDate }, ref) => {
+const HistoryTable = forwardRef(({ isPdfExporting, defectFilter, selectedPeriod, selectedStartDate, selectedEndDate, getPeriodText }, ref) => {
   const [activeSort, setActiveSort] = useState('latest');
   const [currentMonth1, setCurrentMonth1] = useState(new Date(2020, 4, 1));
   const [currentMonth2, setCurrentMonth2] = useState(new Date(2020, 5, 1));
@@ -226,6 +227,9 @@ const HistoryTable = forwardRef<HTMLDivElement, HistoryTableProps>(({ isPdfExpor
       }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 24, fontWeight: 'bold', margin: 0 }}>HISTORY</h2>
+        <span style={{ fontSize: 14, color: '#666' }}>
+          {getPeriodText(selectedPeriod, selectedStartDate, selectedEndDate)}
+        </span>
       </div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
