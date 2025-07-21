@@ -4,35 +4,38 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import React, { forwardRef } from 'react';
 
 const DefectDifferenceChart = forwardRef(({ selectedBearing, selectedPeriod, selectedStartDate, selectedEndDate }, ref) => {
-  const data = {
-  '전체': [
-    { name: 'Normal', value: 99360 },
-    { name: 'IR', value: 47520 },
-    { name: 'OR', value: 25920 },
-  ],
-  'B001': [
-    { name: 'Normal', value: 25920 },
-    { name: 'IR', value: 10800 },
-    { name: 'OR', value: 6480 },
-  ],
-  'B002': [
-    { name: 'Normal', value: 23760 },
-    { name: 'IR', value: 12960 },
-    { name: 'OR', value: 6480 },
-  ],
-  'B003': [
-    { name: 'Normal', value: 21600 },
-    { name: 'IR', value: 15120 },
-    { name: 'OR', value: 6480 },
-  ],
-  'B004': [
-    { name: 'Normal', value: 28080 },
-    { name: 'IR', value: 8640 },
-    { name: 'OR', value: 6480 },
-  ],
-};
+  const generatePieData = (period, bearing) => {
+    const baseData = {
+      '전체': { Normal: 99360, IR: 47520, OR: 25920 },
+      'B001': { Normal: 25920, IR: 10800, OR: 6480 },
+      'B002': { Normal: 23760, IR: 12960, OR: 6480 },
+      'B003': { Normal: 21600, IR: 15120, OR: 6480 },
+      'B004': { Normal: 28080, IR: 8640, OR: 6480 },
+    };
 
-  const pieData = data[selectedBearing] || data['전체'];
+    let currentData = baseData[bearing] || baseData['전체'];
+
+    if (period === '1주') {
+      // '1주'일 때 '오늘' 데이터에서 약간의 변화를 줍니다.
+      const fluctuate = (value) => {
+        const change = Math.floor(Math.random() * 1000) - 500; // -500 ~ +499
+        return Math.max(0, value + change);
+      };
+      currentData = {
+        Normal: fluctuate(currentData.Normal),
+        IR: fluctuate(currentData.IR),
+        OR: fluctuate(currentData.OR),
+      };
+    }
+
+    return [
+      { name: 'Normal', value: currentData.Normal, color: '#10b981' },
+      { name: 'IR', value: currentData.IR, color: '#ef4444' },
+      { name: 'OR', value: currentData.OR, color: '#f59e0b' },
+    ];
+  };
+
+  const pieData = generatePieData(selectedPeriod, selectedBearing);
 
   const COLORS = ['#6477FF', '#43A0FF', '#9A6BFF'];
 
