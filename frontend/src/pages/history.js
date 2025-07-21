@@ -41,7 +41,15 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
   return (
     <div style={reportControlsStyle}>
       <div style={headerStyle}>
-        <span>HISTORY</span>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ marginRight: '16px' }}>HISTORY</span>
+          <div>
+            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B001</button>
+            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B002</button>
+            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B003</button>
+            <button style={{ marginRight: 8, padding: '8px 16px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer', fontSize: '14px' }}>B004</button>
+          </div>
+        </div>
         <button
           onClick={handleDownloadReport}
           disabled={isDownloading || !libsLoaded}

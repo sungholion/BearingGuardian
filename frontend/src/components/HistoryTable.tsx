@@ -21,6 +21,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
 
   interface HistoryItem {
     id: string;
+    bearingId: string;
     timestamp: string;
     classificationNumber: string;
     defectType: string;
@@ -35,6 +36,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
     let currentTimestamp = new Date('2025-07-21T23:59:59'); // 오늘 날짜의 끝 시간부터 역순으로 시작
     let currentRUL = 95.0; // 95에서 시작
 
+    const bearingIds = ['B001', 'B002', 'B003', 'B004'];
     const defectTypes = ['IR', 'OR', 'Normal'];
     const mediaTypes = ['audio', 'image'];
     const audioUrls = ['/audio/sample1.mp3', '/audio/sample2.mp3', '/audio/sample3.mp3', '/audio/sample4.mp3', '/audio/sample5.mp3'];
@@ -43,6 +45,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
     // 오늘 날짜 데이터 (10분 간격으로 100개)
     for (let i = 0; i < 100; i++) {
       const id = (i + 1).toString();
+      const bearingId = bearingIds[Math.floor(Math.random() * bearingIds.length)];
       const timestamp = currentTimestamp.toISOString().slice(0, 19).replace('T', ' ');
       const predictedRULValue = Math.max(0, 95.0 - (i * 0.1));
       const predictedRUL = `${predictedRULValue.toFixed(1)}`;
@@ -62,6 +65,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
 
       data.push({
         id,
+        bearingId,
         timestamp,
         classificationNumber,
         defectType,
@@ -77,6 +81,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
     currentTimestamp = new Date('2025-07-20T23:59:59'); // 오늘 이전 날짜부터 시작
     for (let i = 100; i < numItems; i++) {
       const id = (i + 1).toString();
+      const bearingId = bearingIds[Math.floor(Math.random() * bearingIds.length)];
       const timestamp = currentTimestamp.toISOString().slice(0, 19).replace('T', ' ');
       const predictedRULValue = Math.max(0, 95.0 - (i * 0.1));
       const predictedRUL = `${predictedRULValue.toFixed(1)}`;
@@ -96,6 +101,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
 
       data.push({
         id,
+        bearingId,
         timestamp,
         classificationNumber,
         defectType,
@@ -221,6 +227,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
         <thead>
           <tr style={{ background: '#f8f8f8' }}>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>기록 일시</th>
+            <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>베어링 번호</th>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>분류 번호</th>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>불량 유형</th>
             <th style={{ padding: '12px', borderBottom: '1px solid #eee', textAlign: 'center' }}>예측 잔여 수명</th>
@@ -237,6 +244,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
           {currentItems.map(item => (
             <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.timestamp}</td>
+              <td style={{ padding: '12px', textAlign: 'center' }}>{item.bearingId}</td>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.classificationNumber}</td>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.defectType}</td>
               <td style={{ padding: '12px', textAlign: 'center' }}>{item.predictedRUL}</td>
