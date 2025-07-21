@@ -10,7 +10,7 @@ import ManyBearingHistory from '../components/ManyBearingHistory';
 import { useTheme } from '../contexts/ThemeContext';
 
 // ReportControls 컴포넌트가 handleDownloadReport 함수와 isDownloading, libsLoaded 상태를 받도록 변경
-function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter }) {
+function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme, defectFilter, setDefectFilter, selectedPeriod, setSelectedPeriod, selectedStartDate, setSelectedStartDate, selectedEndDate, setSelectedEndDate }) {
   // Add a state to manage the active period button
   const [activePeriod, setActivePeriod] = useState('전체');
 
@@ -70,25 +70,41 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
         flexWrap: 'wrap',
         gap: 10,
       }}>
-        <input type="date" style={{
-          height: 36,
-          borderRadius: 8,
-          border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
-          background: theme === 'dark' ? '#1a202c' : '#fff',
-          color: theme === 'dark' ? '#e2e8f0' : '#555',
-          padding: '0 12px',
-          fontSize: 14,
-        }}/>
+        <input 
+          type="date" 
+          value={selectedStartDate ? selectedStartDate.toISOString().split('T')[0] : ''}
+          onChange={(e) => {
+            setSelectedStartDate(e.target.value ? new Date(e.target.value) : null);
+            setSelectedPeriod('사용자 지정');
+          }}
+          style={{
+            height: 36,
+            borderRadius: 8,
+            border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
+            background: theme === 'dark' ? '#1a202c' : '#fff',
+            color: theme === 'dark' ? '#e2e8f0' : '#555',
+            padding: '0 12px',
+            fontSize: 14,
+          }}
+        />
         <span style={{ fontSize: 16, color: theme === 'dark' ? '#a0aec0' : '#555' }}>-</span>
-        <input type="date" style={{
-          height: 36,
-          borderRadius: 8,
-          border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
-          background: theme === 'dark' ? '#1a202c' : '#fff',
-          color: theme === 'dark' ? '#e2e8f0' : '#555',
-          padding: '0 12px',
-          fontSize: 14,
-        }}/>
+        <input 
+          type="date" 
+          value={selectedEndDate ? selectedEndDate.toISOString().split('T')[0] : ''}
+          onChange={(e) => {
+            setSelectedEndDate(e.target.value ? new Date(e.target.value) : null);
+            setSelectedPeriod('사용자 지정');
+          }}
+          style={{
+            height: 36,
+            borderRadius: 8,
+            border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
+            background: theme === 'dark' ? '#1a202c' : '#fff',
+            color: theme === 'dark' ? '#e2e8f0' : '#555',
+            padding: '0 12px',
+            fontSize: 14,
+          }}
+        />
         <div style={{
           display: 'flex',
           gap: 6,
@@ -98,13 +114,17 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
           {['전체', '오늘', '1주', '1개월', '1년'].map((text) => (
             <button
               key={text}
-              onClick={() => setActivePeriod(text)} 
+              onClick={() => {
+                setSelectedPeriod(text);
+                setSelectedStartDate(null);
+                setSelectedEndDate(null);
+              }} 
               style={{
                 padding: '8px 14px',
                 borderRadius: 8,
-                border: activePeriod === text ? '1px solid #007bff' : `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
-                background: activePeriod === text ? '#e0f2ff' : (theme === 'dark' ? '#2d3748' : '#f8f8f8'),
-                color: activePeriod === text ? '#007bff' : (theme === 'dark' ? '#a0aec0' : '#555'),
+                border: selectedPeriod === text ? '1px solid #007bff' : `1px solid ${theme === 'dark' ? '#4a5568' : '#e0e0e0'}`,
+                background: selectedPeriod === text ? '#e0f2ff' : (theme === 'dark' ? '#2d3748' : '#f8f8f8'),
+                color: selectedPeriod === text ? '#007bff' : (theme === 'dark' ? '#a0aec0' : '#555'),
                 fontSize: 14,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -132,7 +152,7 @@ function ReportControls({ handleDownloadReport, isDownloading, libsLoaded, theme
           fontSize: 14,
           cursor: 'pointer',
         }}>
-          위험도순
+          오래된순
         </button>
         <select
           value={defectFilter} // defectFilter 상태와 연결
@@ -164,7 +184,10 @@ export default function HistoryPage() {
   const [libsLoaded, setLibsLoaded] = useState(false);
   const [isPdfExporting, setIsPdfExporting] = useState(false); 
   const { theme } = useTheme();
-  const [defectFilter, setDefectFilter] = useState('전체'); // HistoryPage에 defectFilter 상태 추가
+  const [defectFilter, setDefectFilter] = useState('전체');
+  const [selectedPeriod, setSelectedPeriod] = useState('전체');
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [notifications, setNotifications] = useState([
     { id: 1, message: '베어링 1 온도 임계치 초과', timestamp: '2025-07-21 12:01:00' },
     { id: 2, message: '베어링 3 외륜 결함 발생', timestamp: '2025-07-21 12:00:00' },
@@ -319,8 +342,14 @@ export default function HistoryPage() {
             isDownloading={isDownloading}
             libsLoaded={libsLoaded}
             theme={theme}
-            defectFilter={defectFilter} // ReportControls에 defectFilter 전달
-            setDefectFilter={setDefectFilter} // ReportControls에 setDefectFilter 전달
+            defectFilter={defectFilter}
+            setDefectFilter={setDefectFilter}
+            selectedPeriod={selectedPeriod}
+            setSelectedPeriod={setSelectedPeriod}
+            selectedStartDate={selectedStartDate}
+            setSelectedStartDate={setSelectedStartDate}
+            selectedEndDate={selectedEndDate}
+            setSelectedEndDate={setSelectedEndDate}
           />
 
           {/* PDF로 캡처할 컨텐츠 영역 (테이블과 차트) */}
@@ -329,7 +358,13 @@ export default function HistoryPage() {
             style={contentContainerStyle}
           >
             {/* HistoryTable */}
-            <HistoryTable isPdfExporting={isPdfExporting} defectFilter={defectFilter} /> {/* Pass the new prop here */}
+            <HistoryTable 
+              isPdfExporting={isPdfExporting} 
+              defectFilter={defectFilter} 
+              selectedPeriod={selectedPeriod}
+              selectedStartDate={selectedStartDate}
+              selectedEndDate={selectedEndDate}
+            />
 
             {/* 하단: 3열 카드 (불량률 파이 차트, 잔여 수명 추이 차트, 다중 베어링 이력) */}
             <div style={{ display: 'flex', gap: 24, width: '100%' }}>

@@ -8,10 +8,8 @@ interface HistoryTableProps {
 }
 
 // Update the function signature to accept props
-export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTableProps & { defectFilter: string }) {
+export default function HistoryTable({ isPdfExporting, defectFilter, selectedPeriod, selectedStartDate, selectedEndDate }: HistoryTableProps & { defectFilter: string, selectedPeriod: string, selectedStartDate: Date | null, selectedEndDate: Date | null }) {
   const [activeSort, setActiveSort] = useState('latest');
-  const [selectedStartDate, setSelectedStartDate] = useState(new Date(2020, 4, 1));
-  const [selectedEndDate, setSelectedEndDate] = useState(new Date(2020, 5, 26));
   const [currentMonth1, setCurrentMonth1] = useState(new Date(2020, 4, 1));
   const [currentMonth2, setCurrentMonth2] = useState(new Date(2020, 5, 1));
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -33,7 +31,8 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
 
   const generateHistoryData = (numItems: number): HistoryItem[] => {
     const data: HistoryItem[] = [];
-    let currentTimestamp = new Date('2025-07-18T13:00:00');
+    const today = new Date('2025-07-21T00:00:00'); // 오늘 날짜의 시작 시간
+    let currentTimestamp = new Date('2025-07-21T23:59:59'); // 오늘 날짜의 끝 시간부터 역순으로 시작
     let currentRUL = 95.0; // 95에서 시작
 
     const defectTypes = ['IR', 'OR', 'Normal'];
@@ -41,47 +40,21 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
     const audioUrls = ['/audio/sample1.mp3', '/audio/sample2.mp3', '/audio/sample3.mp3', '/audio/sample4.mp3', '/audio/sample5.mp3'];
     const imageUrls = ['/images/sample1.png', '/images/sample2.png', '/images/sample3.png', '/images/sample4.png', '/images/sample5.png'];
 
-    for (let i = 0; i < numItems; i++) {
+    // 오늘 날짜 데이터 (10분 간격으로 100개)
+    for (let i = 0; i < 100; i++) {
       const id = (i + 1).toString();
-      const year = currentTimestamp.getFullYear();
-      const month = (currentTimestamp.getMonth() + 1).toString().padStart(2, '0');
-      const day = currentTimestamp.getDate().toString().padStart(2, '0');
-      const hours = currentTimestamp.getHours().toString().padStart(2, '0');
-      const minutes = currentTimestamp.getMinutes().toString().padStart(2, '0');
-      const seconds = currentTimestamp.getSeconds().toString().padStart(2, '0');
-      const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-      // predictedRUL은 95에서 시작하여 0.1씩 감소하거나 유지되거나 하는 랜덤한 변화
-      // 가장 최근 데이터가 가장 낮은 수치여야 하므로, i가 증가할수록 RUL이 감소하도록 조정
-      const predictedRULValue = 95.0 - (i * 0.1); // 95에서 시작하여 0.1씩 감소
+      const timestamp = currentTimestamp.toISOString().slice(0, 19).replace('T', ' ');
+      const predictedRULValue = Math.max(0, 95.0 - (i * 0.1));
       const predictedRUL = `${predictedRULValue.toFixed(1)}`;
 
-      let defectType: string;
-      let classificationNumber: string;
-
-      // 첫 번째 페이지 항목 (0, 1, 2, 3 인덱스)에 대한 강제 설정
-      if (i === 0) {
-        defectType = 'Normal';
-        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else if (i === 1) {
-        defectType = 'Normal';
-        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else if (i === 2) {
-        defectType = 'IR';
+      const defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+      let classificationNumber;
+      if (defectType === 'OR') {
+        classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (defectType === 'IR') {
         classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else if (i === 3) {
-        defectType = 'Normal';
+      } else { // Normal
         classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-      } else {
-        // 나머지 항목은 기존 로직 유지 (랜덤)
-        defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
-        if (defectType === 'OR') {
-          classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-        } else if (defectType === 'IR') {
-          classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-        } else { // Normal
-          classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
-        }
       }
 
       const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
@@ -97,14 +70,47 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
         mediaUrl,
       });
 
-      // 시간을 역순으로 감소 (예: 2초씩 감소)
-      currentTimestamp = new Date(currentTimestamp.getTime() - 2 * 1000); // 2초씩 감소
+      currentTimestamp = new Date(currentTimestamp.getTime() - 10 * 60 * 1000); // 10분씩 감소
+    }
+
+    // 과거 데이터 (나머지 항목, 12시간 간격)
+    currentTimestamp = new Date('2025-07-20T23:59:59'); // 오늘 이전 날짜부터 시작
+    for (let i = 100; i < numItems; i++) {
+      const id = (i + 1).toString();
+      const timestamp = currentTimestamp.toISOString().slice(0, 19).replace('T', ' ');
+      const predictedRULValue = Math.max(0, 95.0 - (i * 0.1));
+      const predictedRUL = `${predictedRULValue.toFixed(1)}`;
+
+      const defectType = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+      let classificationNumber;
+      if (defectType === 'OR') {
+        classificationNumber = `O_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else if (defectType === 'IR') {
+        classificationNumber = `I_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      } else { // Normal
+        classificationNumber = `N_${Math.floor(Math.random() * 100).toString().padStart(3, '0')}`;
+      }
+
+      const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
+      const mediaUrl = mediaType === 'audio' ? audioUrls[Math.floor(Math.random() * audioUrls.length)] : imageUrls[Math.floor(Math.random() * imageUrls.length)];
+
+      data.push({
+        id,
+        timestamp,
+        classificationNumber,
+        defectType,
+        predictedRUL,
+        mediaType: mediaType as 'audio' | 'image',
+        mediaUrl,
+      });
+
+      currentTimestamp = new Date(currentTimestamp.getTime() - 12 * 60 * 60 * 1000); // 12시간씩 감소
     }
     return data;
   };
 
   useEffect(() => {
-    const generatedData = generateHistoryData(50);
+    const generatedData = generateHistoryData(1000); // 총 1000개 항목 생성
     const sortedData = generatedData.sort((a, b) => {
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
@@ -114,17 +120,58 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
 
   useEffect(() => {
     let dataToFilter = historyData;
+
+    // Defect filter
     if (defectFilter === '정상') {
-      dataToFilter = historyData.filter(item => item.defectType === 'Normal');
+      dataToFilter = dataToFilter.filter(item => item.defectType === 'Normal');
     } else if (defectFilter === '불량') {
-      dataToFilter = historyData.filter(item => item.defectType === 'IR' || item.defectType === 'OR');
+      dataToFilter = dataToFilter.filter(item => item.defectType === 'IR' || item.defectType === 'OR');
     }
-    setFilteredHistoryData(dataToFilter);
+
+    // Date filter
+    const now = new Date();
+    let startDate = null;
+    let endDate = null;
+
+    if (selectedPeriod === '오늘') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (selectedPeriod === '1주') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (selectedPeriod === '1개월') {
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (selectedPeriod === '1년') {
+      startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (selectedStartDate && selectedEndDate) {
+      startDate = selectedStartDate;
+      endDate = new Date(selectedEndDate.getFullYear(), selectedEndDate.getMonth(), selectedEndDate.getDate(), 23, 59, 59, 999); // End of selected day
+    }
+
+    if (startDate && endDate) {
+      dataToFilter = dataToFilter.filter(item => {
+        const itemDate = new Date(item.timestamp);
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+
+    // Sorting
+    let sortedData = [...dataToFilter]; // Create a copy to sort
+    if (activeSort === 'latest') {
+      sortedData.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    } else if (activeSort === 'oldest') {
+      sortedData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    }
+
+    setFilteredHistoryData(sortedData);
     setCurrentPage(1); // Reset to first page on filter change
-  }, [defectFilter, historyData]);
+  }, [defectFilter, historyData, selectedPeriod, selectedStartDate, selectedEndDate, activeSort]);
+
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -134,114 +181,27 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const handlePrevPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+  const handlePrevPageBlock = () => {
+    setCurrentPage(prev => Math.max(1, prev - 10));
   };
 
-  const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const handleNextPageBlock = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 10));
   };
 
-  // 날짜 포맷 함수
-  const formatDate = (date: Date) => `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}.`;
-  const formatDateRange = () =>
-    selectedStartDate && selectedEndDate
-      ? `${formatDate(selectedStartDate)} ~ ${formatDate(selectedEndDate)}`
-      : selectedStartDate
-        ? `${formatDate(selectedStartDate)} ~`
-        : '';
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+    const endPage = Math.min(totalPages, startPage + 9);
 
-  // 달력 렌더링
-  const renderCalendar = (monthDate: Date, isFirstCalendar: boolean) => {
-    const year = monthDate.getFullYear();
-    const month = monthDate.getMonth();
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    const days = [];
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    for (let i = firstDayOfMonth - 1; i >= 0; i--) days.push({ day: prevMonthDays - i, currentMonth: false });
-    for (let i = 1; i <= daysInMonth; i++) days.push({ day: i, currentMonth: true, date: new Date(year, month, i) });
-    const remainingCells = 42 - days.length;
-    for (let i = 1; i <= remainingCells; i++) days.push({ day: i, currentMonth: false });
-
-    const handleDayClick = (dayObj: any) => {
-      if (!dayObj.currentMonth) return;
-      const clickedDate = dayObj.date;
-      if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-        setSelectedStartDate(clickedDate);
-        setSelectedEndDate(null);
-      } else if (clickedDate < selectedStartDate) {
-        setSelectedStartDate(clickedDate);
-        setSelectedEndDate(null);
-      } else {
-        setSelectedEndDate(clickedDate);
-      }
-    };
-    const isSelected = (date: Date) => {
-      if (!date) return false;
-      const start = selectedStartDate ? selectedStartDate.toDateString() : null;
-      const end = selectedEndDate ? selectedEndDate.toDateString() : null;
-      const current = date.toDateString();
-      return current === start || current === end;
-    };
-    const isInRange = (date: Date) => {
-      if (!selectedStartDate || !selectedEndDate) return false;
-      return date >= selectedStartDate && date <= selectedEndDate;
-    };
-
-    return (
-      <div style={{ flex: 1, padding: '0 10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <button
-            onClick={() => {
-              if (isFirstCalendar) {
-                setCurrentMonth1(new Date(year, month - 1, 1));
-                setCurrentMonth2(new Date(year, month, 1));
-              }
-            }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#555' }}
-          >
-            &lt;
-          </button>
-          <span style={{ fontWeight: 'bold', color: '#333' }}>{year}. {month + 1}.</span>
-          <button
-            onClick={() => {
-              if (isFirstCalendar) {
-                setCurrentMonth1(new Date(year, month + 1, 1));
-                setCurrentMonth2(new Date(year, month + 2, 1));
-              }
-            }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#555' }}
-          >
-            &gt;
-          </button>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 5, textAlign: 'center' }}>
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((dayName, idx) => (
-            <span key={dayName} style={{ fontWeight: 'bold', color: idx === 0 ? 'red' : idx === 6 ? 'blue' : '#333' }}>{dayName}</span>
-          ))}
-          {days.map((dayObj, index) => (
-            <div
-              key={index}
-              onClick={() => handleDayClick(dayObj)}
-              style={{
-                padding: '5px 0',
-                borderRadius: '4px',
-                cursor: dayObj.currentMonth ? 'pointer' : 'default',
-                color: dayObj.currentMonth ? (isSelected(dayObj.date) ? '#fff' : (dayObj.date?.getDay() === 0 ? 'red' : dayObj.date?.getDay() === 6 ? 'blue' : '#333')) : '#ccc',
-                background: isSelected(dayObj.date) ? '#007bff' : isInRange(dayObj.date) ? '#e0f2ff' : 'none',
-                fontWeight: isSelected(dayObj.date) ? 'bold' : 'normal',
-                transition: 'background 0.1s',
-              }}
-            >
-              {dayObj.day}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
   };
+
+  const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+  const endPage = Math.min(totalPages, startPage + 9);
 
   return (
     <div
@@ -331,13 +291,20 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
         }}
       >
         <button
-          onClick={handlePrevPage}
+          onClick={handlePrevPageBlock}
+          disabled={startPage === 1}
+          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
+        >
+          &lt;&lt;
+        </button>
+        <button
+          onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
           style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
         >
           &lt;
         </button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+        {renderPageNumbers().map(pageNumber => (
           <button
             key={pageNumber}
             onClick={() => paginate(pageNumber)}
@@ -354,11 +321,18 @@ export default function HistoryTable({ isPdfExporting, defectFilter }: HistoryTa
           </button>
         ))}
         <button
-          onClick={handleNextPage}
+          onClick={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
           style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
         >
           &gt;
+        </button>
+        <button
+          onClick={handleNextPageBlock}
+          disabled={endPage === totalPages}
+          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #ddd', background: '#f9f9f9', cursor: 'pointer' }}
+        >
+          &gt;&gt;
         </button>
       </div>
 
