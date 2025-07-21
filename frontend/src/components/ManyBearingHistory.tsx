@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-export default function ManyBearingHistory({ selectedBearing }) {
+const ManyBearingHistory = forwardRef(({ selectedBearing }, ref) => {
   const data = [
     { label: '베어링 1', value: 85 },
     { label: '베어링 2', value: 60 },
@@ -17,6 +17,7 @@ export default function ManyBearingHistory({ selectedBearing }) {
 
   return (
     <div
+      ref={ref}
       style={{
         background: '#fff',
         borderRadius: 16,
@@ -120,4 +121,6 @@ export default function ManyBearingHistory({ selectedBearing }) {
       </svg>
     </div>
   );
-}
+});
+
+export default ManyBearingHistory;

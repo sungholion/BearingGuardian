@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, forwardRef } from 'react';
 
 // Define the props interface for HistoryTable
 interface HistoryTableProps {
   isPdfExporting?: boolean; // Make it optional, as it might not always be passed or needed for all uses
+  defectFilter: string;
+  selectedPeriod: string;
+  selectedStartDate: Date | null;
+  selectedEndDate: Date | null;
 }
 
-// Update the function signature to accept props
-export default function HistoryTable({ isPdfExporting, defectFilter, selectedPeriod, selectedStartDate, selectedEndDate }: HistoryTableProps & { defectFilter: string, selectedPeriod: string, selectedStartDate: Date | null, selectedEndDate: Date | null }) {
+// Update the function signature to accept props and ref
+const HistoryTable = forwardRef<HTMLDivElement, HistoryTableProps>(({ isPdfExporting, defectFilter, selectedPeriod, selectedStartDate, selectedEndDate }, ref) => {
   const [activeSort, setActiveSort] = useState('latest');
   const [currentMonth1, setCurrentMonth1] = useState(new Date(2020, 4, 1));
   const [currentMonth2, setCurrentMonth2] = useState(new Date(2020, 5, 1));
@@ -211,6 +215,7 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
 
   return (
     <div
+      ref={ref}
       style={{
         background: '#fff',
         borderRadius: 16,
@@ -370,4 +375,6 @@ export default function HistoryTable({ isPdfExporting, defectFilter, selectedPer
       )}
     </div>
   );
-}
+});
+
+export default HistoryTable;

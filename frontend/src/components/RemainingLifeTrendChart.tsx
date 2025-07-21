@@ -1,6 +1,7 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts';
+import React, { forwardRef } from 'react';
 
-export default function RemainingLifeTrendChart({ selectedBearing }) {
+const RemainingLifeTrendChart = forwardRef(({ selectedBearing }, ref) => {
   // 정적인 누적 잔여 수명 데이터 (예시)
   const data = [
     { date: '2025-07-01', '잔여 사이클 수': 95.0 },
@@ -25,6 +26,7 @@ export default function RemainingLifeTrendChart({ selectedBearing }) {
 
   return (
     <div
+      ref={ref}
       style={{
         background: '#fff',
         borderRadius: 16,
@@ -70,4 +72,6 @@ export default function RemainingLifeTrendChart({ selectedBearing }) {
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default RemainingLifeTrendChart;

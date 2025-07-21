@@ -1,9 +1,9 @@
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-export default function DefectDifferenceChart({ selectedBearing }) {
+const DefectDifferenceChart = forwardRef(({ selectedBearing }, ref) => {
   const data = {
   '전체': [
     { name: 'Normal', value: 99360 },
@@ -75,6 +75,7 @@ export default function DefectDifferenceChart({ selectedBearing }) {
 
   return (
     <div
+      ref={ref}
       style={{
         background: '#fff',
         borderRadius: 16,
@@ -166,4 +167,6 @@ export default function DefectDifferenceChart({ selectedBearing }) {
       </div>
     </div>
   );
-}
+});
+
+export default DefectDifferenceChart;
