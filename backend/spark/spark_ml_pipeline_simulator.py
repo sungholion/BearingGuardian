@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 import time
@@ -56,9 +55,10 @@ class DataFrameReaderSimulator:
 
 class DataFrameSimulator:
     """PySpark의 DataFrame을 시뮬레이션합니다."""
-    def __init__(self, source):
+    def __init__(self, source, is_empty=False):
         self.source = source
         self.columns = ["key", "value"]
+        self._is_empty = is_empty
 
     def withColumn(self, colName, col):
         print(f"[Spark-Transform] 컬럼 추가/변경: '{colName}'")
@@ -77,6 +77,12 @@ class DataFrameSimulator:
     def show(self):
         print(f"[Spark-Show] DataFrame 내용 미리보기 (Source: {self.source})")
         print(f"Columns: {self.columns}")
+
+    def isEmpty(self):
+        """DataFrame이 비어있는지 확인하는 메서드 시뮬레이션."""
+        # 실제로는 self.rdd.isEmpty() 또는 self.count() == 0 사용
+        print("[Spark-Check] DataFrame이 비어있는지 확인합니다...")
+        return self._is_empty
 
 class DataFrameWriterSimulator:
     """DataFrame 쓰기 작업을 시뮬레이션합니다."""
@@ -113,8 +119,7 @@ class SparkMLModelSimulator:
 
 def run_spark_etl_job(spark, s3_bucket):
     """1단계: Hive 데이터 전처리 및 S3 저장."""
-    print("
---- [Phase 1: ETL] Spark ETL 작업을 시작합니다. ---")
+    print("\n--- [Phase 1: ETL] Spark ETL 작업을 시작합니다. ---")
     # 1. Hive에서 데이터 로드
     raw_df = spark.read().table("bearing_db.bearing_archive")
     raw_df.show()
@@ -126,17 +131,24 @@ def run_spark_etl_job(spark, s3_bucket):
                            .select("key", "feature_vibration", "feature_temperature")
     processed_df.show()
 
-    # 3. S3에 Parquet 형식으로 저장
-    today_str = datetime.datetime.now().strftime('%Y-%m-%d')
-    s3_output_path = f"s3a://{s3_bucket}/processed-data/{today_str}/"
-    processed_df.write().mode("overwrite").save(s3_output_path)
-    print("--- [Phase 1: ETL] ETL 작업 완료. ---")
-    return s3_output_path
+    # 3. [개선된 로직] 데이터 유효성 검사: DataFrame이 비어있는지 확인
+    # HDFS의 원본 파티션에 데이터가 없는 경우, 후속 작업을 방지하여 파이프라인 안정성 확보
+    if processed_df.isEmpty():
+        print("[Spark-ETL-Check] 경고: 처리할 데이터가 없습니다. S3에 빈 데이터를 저장하지 않고 작업을 종료합니다.")
+        print("--- [Phase 1: ETL] 작업 조기 종료 (데이터 없음). ---")
+        return None # 후속 ML 작업이 실행되지 않도록 None 반환
+    else:
+        print("[Spark-ETL-Check] 유효한 데이터가 확인되었습니다. S3에 저장을 계속합니다.")
+        # 4. S3에 Parquet 형식으로 저장
+        today_str = datetime.datetime.now().strftime('%Y-%m-%d')
+        s3_output_path = f"s3a://{s3_bucket}/processed-data/{today_str}/"
+        processed_df.write().mode("overwrite").save(s3_output_path)
+        print("--- [Phase 1: ETL] ETL 작업 완료. ---")
+        return s3_output_path
 
 def run_spark_prediction_job(spark, s3_processed_path, s3_model_path, pg_options):
     """2단계: S3 데이터로 ML 예측 및 PostgreSQL 저장."""
-    print("
---- [Phase 2: ML] Spark ML 예측 작업을 시작합니다. ---")
+    print("\n--- [Phase 2: ML] Spark ML 예측 작업을 시작합니다. ---")
     # 4. S3에서 전처리된 데이터 로드
     feature_df = spark.read().load(s3_processed_path)
     feature_df.show()
@@ -164,6 +176,7 @@ if __name__ == "__main__":
     print(" Spark ETL & ML Prediction Pipeline Simulator")
     print(" 이 스크립트는 Spark를 이용한 전체 데이터 파이프라인을 시뮬레이션합니다.")
     print("="*60)
+
     # SparkSession 시작
     spark_session = SparkSessionSimulator().getOrCreate()
 
@@ -181,8 +194,14 @@ if __name__ == "__main__":
     try:
         # 1단계 실행
         s3_path = run_spark_etl_job(spark_session, S3_BUCKET)
-        # 2단계 실행
-        run_spark_prediction_job(spark_session, s3_path, S3_MODEL_PATH, POSTGRES_OPTIONS)
+        
+        # [개선된 로직] ETL 작업 결과가 있을 때만 ML 예측 실행
+        if s3_path:
+            # 2단계 실행
+            run_spark_prediction_job(spark_session, s3_path, S3_MODEL_PATH, POSTGRES_OPTIONS)
+        else:
+            print("\n[Pipeline-Control] ETL 단계에서 생성된 데이터가 없어 ML 예측 단계를 건너뜁니다.")
+
     finally:
         # SparkSession 종료
         spark_session.stop()
