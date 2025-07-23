@@ -24,47 +24,55 @@
 <center>
 <h1>Tech Stack</h1>
 
-### FrontEnd
-
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white"> <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=CSS3&logoColor=white">
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white">
-<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
-<img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white">
-<img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white">
-<img src="https://img.shields.io/badge/Android WebView-3DDC84?logoColor=fff&style=for-the-badge">
 
 ### Infra
-<img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Apache_Airflow-017CEE?logo=apacheairflow&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Apache_Kafka-231F20?logo=apachekafka&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/WebSocket-337AB7?&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Apache_Hadoop-66CCFF?logo=apachehadoop&logoColor=000&style=for-the-badge">
-<img src="https://img.shields.io/badge/Apache_Hive-FDEE21?logo=apachehive&logoColor=000&style=for-the-badge"> <img src="https://img.shields.io/badge/Apache_Spark-E25A1C?logo=apachespark&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Amazon_S3-569A31?logo=amazonaws&logoColor=fff&style=for-the-badge">
+<p>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white"/>
+  <img src="https://img.shields.io/badge/S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white"/>
+</p>
 
-
-<img src="https://img.shields.io/badge/Redis-FF4438?logoColor=fff&style=for-the-badge">
+### Data Pipeline
+<p>
+  <img src="https://img.shields.io/badge/Kafka-231F20?style=for-the-badge&logo=Apache%20Kafka&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Hadoop-66CCFF?style=for-the-badge&logo=Apache%20Hadoop&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Hive-FDEE21?style=for-the-badge&logo=Apache%20Hive&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Spark-E25A1C?style=for-the-badge&logo=Apache%20Spark&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/>
+</p>
 
 ### Backend
+<p>
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=Flask&logoColor=white"/>
+  <img src="https://img.shields.io/badge/WebSocket-010101?style=for-the-badge&logo=WebSocket&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white"/>
+</p>
 
+### Data Analysis
+<p>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"/>
+  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=TensorFlow&logoColor=white"/>
+</p>
 
-### Android
+### FrontEnd
 
-<img src="https://img.shields.io/badge/Android-34A853?logo=android&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Android%20Studio-3DDC84?logo=androidstudio&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Android%20Jetpack-4285F4?logo=jetpackcompose&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/FCM-4285F4?logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/WebSocket-337AB7?&logoColor=fff&style=for-the-badge">
-
-### DB
-
-<img src="https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Redis-FF4438?logoColor=fff&style=for-the-badge">
+<p>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=Next.js&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=TailwindCSS&logoColor=white"/>
+</p>
 
 
 ### Team Collaboration Tools
+<p>
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white"/>  
+  <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=fff&style=for-the-badge">
+  <img src="https://img.shields.io/badge/Notion-000?logo=notion&logoColor=fff&style=for-the-badge">
+</p>
 
-<img src="https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/GitLab-FC6D26?logo=gitlab&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Mattermost-0058CC?logo=mattermost&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Notion-000?logo=notion&logoColor=fff&style=for-the-badge">
 </center>
 
 </br>
