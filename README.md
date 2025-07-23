@@ -33,12 +33,17 @@
 <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white">
 <img src="https://img.shields.io/badge/Android WebView-3DDC84?logoColor=fff&style=for-the-badge">
 
-### BackEnd
+### Infra
+<img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Apache_Airflow-017CEE?logo=apacheairflow&logoColor=fff&style=for-the-badge">
+<img src="https://img.shields.io/badge/Apache_Kafka-231F20?logo=apachekafka&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/WebSocket-337AB7?&logoColor=fff&style=for-the-badge">
+<img src="https://img.shields.io/badge/Apache_Hadoop-66CCFF?logo=apachehadoop&logoColor=000&style=for-the-badge">
+<img src="https://img.shields.io/badge/Apache_Hive-FDEE21?logo=apachehive&logoColor=000&style=for-the-badge"> <img src="https://img.shields.io/badge/Apache_Spark-E25A1C?logo=apachespark&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Amazon_S3-569A31?logo=amazonaws&logoColor=fff&style=for-the-badge">
 
-<img src="https://img.shields.io/badge/JAVA-FBBA00?logoColor=000&style=for-the-badge"> <img src="https://img.shields.io/badge/Spring-6DB33F?logo=spring&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Spring%20Security-6DB33F?logo=springsecurity&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/WebSocket-337AB7?&logoColor=fff&style=for-the-badge">
+
+<img src="https://img.shields.io/badge/Redis-FF4438?logoColor=fff&style=for-the-badge">
+
+### Backend
+
 
 ### Android
 
@@ -53,12 +58,6 @@
 <img src="https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=fff&style=for-the-badge">
 <img src="https://img.shields.io/badge/Redis-FF4438?logoColor=fff&style=for-the-badge">
 
-### CI/CD
-
-<img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=for-the-badge"> <img src="https://img.shields.io/badge/Jenkins-D24939?logo=jenkins&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Amazon%20S3-569A31?logo=amazons3&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/Amazon%20EC2-F90?logo=amazonec2&logoColor=fff&style=for-the-badge">
-<img src="https://img.shields.io/badge/NGINX-009639?logo=nginx&logoColor=fff&style=for-the-badge">
 
 ### Team Collaboration Tools
 
@@ -300,32 +299,24 @@ History
 
 # 🔨 사용한 기술
 
-## Hybrid App
+## Kafka
 
-이 프로젝트는 모바일 앱 안에 웹 뷰 (Webview)를 띄우는 방식을 사용하였습니다.  
-따라서 앱에서 미리 함수를 정의하여, 이를 웹에서 실행하면 마치 앱에서 함수를 실행하는 효과를 가질 수 있습니다
-
-반대로 웹에서 미리 함수를 정의하고, 앱에서 이를 읽어서 명령어를 실행시키는 방식도 가능합니다
+가나다라 
 
 <img src ="./READMEimg/HybridApp.png" style="width:200px">
 
-## FCM 활용한 푸쉬 알림 기능
+## WebSocket
 
 <img src="./READMEimg/FCM.png" style="width:400px">
 
-## WebSocket & STOMP
+## Hadoop
 
-### WebSocket
+## Hive
 
-웹 소켓을 활용하여 실시간 양방향 통신을 구현 - 채팅방 기능을 위한 메인 프로토콜
+가나다라 
+## Spark
 
-### STOMP
-
-WebSocket 위에서 동작하는 서브 프로토콜로 사용하여 메세지를 구조화하고 pub/sub 기능 구현
-
+가나다라 
 <img src ="./READMEimg/STOMP.png" style="width:200px">
 
-## QR
 
-zxing 라이브러리를 활용하여 QR를 생성함  
-스캔 후 모바일에 저장된 유저 토큰을 활용하셔 인증 처리 및 스탬프를 발급
