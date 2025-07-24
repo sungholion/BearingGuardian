@@ -29,7 +29,7 @@
 <p>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"/>
   <img src="https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white"/>
-  <img src="https://img.shields.io/badge/S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Amazone S3-569A31?style=for-the-badge&logo=AmazonS3%20S3&logoColor=white"/>
 </p>
 
 ### Data Pipeline
