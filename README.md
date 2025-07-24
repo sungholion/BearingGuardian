@@ -309,7 +309,11 @@ History
 
 ## Kafka
 
-가나다라 
+본 프로젝트에서는 실시간 데이터 스트리밍 및 처리를 위해 Apache Kafka를 핵심 구성 요소로 활용합니다. Kafka는 대용량의 데이터를 안정적으로 처리하고, 각기 다른 역할을 하는 시스템 구성 요소들을 비동기적으로 연결하는 역할을 합니다.
+
+- **Producer**: 베어링에서 생성되는 시뮬레이션 데이터를 Kafka 토픽으로 전송합니다. 이 데이터는 베어링의 상태를 나타내는 다양한 센서 값을 포함합니다.
+- **Consumer (Spark Streaming)**: Kafka 토픽에서 데이터를 실시간으로 소비하여 Spark ML 모델을 통해 이상 탐지 및 RUL(잔여 유효 수명) 예측을 수행합니다. 이를 통해 베어링의 현재 상태를 실시간으로 모니터링하고 잠재적인 결함을 조기에 발견할 수 있습니다.
+- **Consumer (Archiver)**: Kafka 토픽의 데이터를 HDFS(Hadoop Distributed File System)에 안정적으로 저장합니다. 이렇게 아카이빙된 데이터는 데이터 파이프라인의 안정성을 확보하고, 추후 모델 성능 개선을 위한 재학습 및 심층 분석에 활용됩니다.
 
 <img src ="./READMEimg/HybridApp.png" style="width:200px">
 
