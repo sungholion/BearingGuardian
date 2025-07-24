@@ -308,26 +308,25 @@ History
 
 ## Kafka
 
-본 프로젝트에서는 실시간 데이터 스트리밍 및 처리를 위해 Apache Kafka를 핵심 구성 요소로 활용합니다. Kafka는 대용량의 데이터를 안정적으로 처리하고, 각기 다른 역할을 하는 시스템 구성 요소들을 비동기적으로 연결하는 역할을 합니다.
+본 프로젝트에서는 실제로 동작하는 베어링 소음 센서 데이터를 흉내내기 위해 베어링 소음 테스트 데이터셋으로 시뮬레이터를 구현하였습니다.
+Kafka는 대용량 데이터를 안정적으로 처리할 수 있어, 센서 시뮬레이터에서 발생한 데이터를 Flask 기반 웹 서버로 비동기적으로 전달하는 데 사용되었습니다. 이를 통해 실시간 처리 및 확장성 있는 데이터 흐름을 구축할 수 있었습니다.
 
 - **Producer**: 베어링에서 생성되는 시뮬레이션 데이터를 Kafka 토픽으로 전송합니다. 이 데이터는 베어링의 상태를 나타내는 다양한 센서 값을 포함합니다.
-- **Consumer (Spark Streaming)**: Kafka 토픽에서 데이터를 실시간으로 소비하여 Spark ML 모델을 통해 이상 탐지 및 RUL(잔여 유효 수명) 예측을 수행합니다. 이를 통해 베어링의 현재 상태를 실시간으로 모니터링하고 잠재적인 결함을 조기에 발견할 수 있습니다.
-- **Consumer (Archiver)**: Kafka 토픽의 데이터를 HDFS(Hadoop Distributed File System)에 안정적으로 저장합니다. 이렇게 아카이빙된 데이터는 데이터 파이프라인의 안정성을 확보하고, 추후 모델 성능 개선을 위한 재학습 및 심층 분석에 활용됩니다.
+- **Consumer**: Kafka 토픽에서 데이터를 실시간으로 수신하고, WebSocket을 통해 Frontend로 전달합니다.
 
-<img src ="./READMEimg/HybridApp.png" style="width:200px">
-
-## WebSocket
-
-<img src="./READMEimg/FCM.png" style="width:400px">
+<img width="600" height="500" alt="Image" src="https://github.com/user-attachments/assets/c8cefe0f-9c1a-47f0-89a5-987c4d2f21ca" />
 
 ## Hadoop
+대용량의 베어링 센서 데이터를 안정적으로 저장하고 관리하기 위해 Hadoop의 분산 파일 시스템인 HDFS(Hadoop Distributed File System)를 사용합니다.
+HDFS는 데이터를 여러 노드에 분산 저장하여 높은 처리량과 데이터 안정성을 보장하며, 이는 장기간의 시계열 데이터를 기반으로 한 모델 학습 및 분석의 기반이 됩니다.
 
 ## Hive
+HDFS에 저장된 대규모 정형 데이터를 쉽게 질의하고 분석하기 위해 데이터 웨어하우스 시스템인 Hive를 도입했습니다. 
+HiveSQL이라는 SQL과 유사한 언어를 사용하여 Hadoop 클러스터에 저장된 데이터를 배치 처리하고, 주기적인 리포트 생성 및 통계 분석 작업을 수행합니다. 
 
-가나다라 
 ## Spark
+본 프로젝트의 핵심 데이터 처리 엔진으로 Apache Spark를 활용합니다. Spark는 대규모 배치 처리를 모두 지원합니다.
+**Spark MLlib & Batch**: HDFS에 축적된 대규모 데이터를 사용하여 머신러닝 모델을 학습하고 평가합니다. 주기적으로 새로운 데이터로 모델을 재학습하여 예측 성능을 지속적으로 개선합니다.
 
-가나다라 
-<img src ="./READMEimg/STOMP.png" style="width:200px">
 
 
