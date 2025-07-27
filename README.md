@@ -101,10 +101,10 @@
 
 비용 감소에 초점을 맞춰 기획을 진행하였고, 기존 솔루션보다 정확도를 높이기 위해 노력했습니다.
 
-`<br><br>`
+<br><br>
 
 # 🎇 서비스 이용 화면
-
+<br>
 ## 1. 대시보드 (Dashboard)
 
 ![Dashboard](gif/dashboard_gif.gif)
