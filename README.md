@@ -11,7 +11,7 @@
 
 <div align="center">
 
-| <img src="https://github.com/sungholion.png" width="100"/> | <img src="https://github.com/ezypzylemon.png" width="100"/> | <img src="https://github.com/JEONGEUNdd.png" width="100"/> | <img src="https://github.com/Heojiwonnn.png" width="100"/> |
+| <img src="https://github.com/sungholion.png" width="200"/> | <img src="https://github.com/ezypzylemon.png" width="200"/> | <img src="https://github.com/JEONGEUNdd.png" width="200"/> | <img src="https://github.com/Heojiwonnn.png" width="200"/> |
 | :------------------------------------------------------------: | :-------------------------------------------------------------: | :------------------------------------------------------------: | :------------------------------------------------------------: |
 |       [조성호 - BE/Data/PM](https://github.com/sungholion)       |         [박정훈 - BE/Data](https://github.com/ezypzylemon)         |         [임정은 - BE/Data](https://github.com/JEONGEUNdd)         |         [허지원 - FE/Data](https://github.com/Heojiwonnn)         |
 
